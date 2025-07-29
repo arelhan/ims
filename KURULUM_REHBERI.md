@@ -9,8 +9,8 @@
 ## 1. Projeyi İndirme
 
 ```bash
-# Projeyi klonla (GitHub/GitLab repository URL'ini buraya ekle)
-git clone [REPOSITORY_URL]
+# Projeyi klonla
+git clone https://github.com/arelhan/ims.git
 cd ims
 
 # Alternatif: Eğer henüz git repository'si yoksa, zip olarak indir
@@ -212,8 +212,8 @@ npm install
 
 ### Local'den GitHub'a Push:
 ```bash
-# GitHub repository URL'ini ekle (GitHub'dan kopyala)
-git remote add origin https://github.com/username/repository-name.git
+# GitHub repository URL'ini ekle
+git remote add origin https://github.com/arelhan/ims.git
 
 # Ana branch'i push et
 git push -u origin main
@@ -225,8 +225,8 @@ git push
 ### Repository Hazır! Şimdi:
 ```bash
 # Eve gidince projeyi indir:
-git clone https://github.com/username/repository-name.git
-cd repository-name
+git clone https://github.com/arelhan/ims.git
+cd ims
 
 # Bağımlılıkları kur
 npm install

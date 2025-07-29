@@ -38,7 +38,7 @@ Detaylı kurulum talimatları için [`KURULUM_REHBERI.md`](./KURULUM_REHBERI.md)
 
 ```bash
 # Repository'yi klonla
-git clone [REPOSITORY_URL]
+git clone https://github.com/arelhan/ims.git
 cd ims
 
 # Bağımlılıkları kur
