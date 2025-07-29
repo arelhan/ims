@@ -1,0 +1,86 @@
+{
+  "nav": {
+    "home": "Anasayfa",
+    "warehouse": "Depo",
+    "inventory": "Envanter",
+    "management": "Yönetim",
+    "profile": "Profil",
+    "logout": "Çıkış"
+  },
+  "dashboard": {
+    "title": "Envanter Yönetim Sistemi",
+    "subtitle": "Hoşgeldiniz",
+    "quickAccess": "Hızlı Erişim",
+    "addAsset": "Varlık Ekle",
+    "viewInventory": "Envanter Görüntüle",
+    "manageUsers": "Kullanıcı Yönetimi",
+    "viewReports": "Raporlar"
+  },
+  "warehouse": {
+    "title": "Depo Yönetimi",
+    "selectCategory": "Kategori Seçin",
+    "addAsset": "Varlık Ekle",
+    "categories": "Kategoriler",
+    "noCategories": "Henüz kategori eklenmemiş"
+  },
+  "inventory": {
+    "title": "Envanter",
+    "search": "Ara...",
+    "filter": "Filtrele",
+    "status": "Durum",
+    "category": "Kategori",
+    "brand": "Marka",
+    "productCode": "Ürün Kodu",
+    "name": "Ad",
+    "actions": "İşlemler",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "assign": "Ata",
+    "available": "Mevcut",
+    "assigned": "Atanmış",
+    "inUse": "Kullanımda",
+    "outOfService": "Hizmet Dışı",
+    "archived": "Arşivlenmiş"
+  },
+  "management": {
+    "title": "Yönetim Paneli",
+    "users": "Kullanıcılar",
+    "units": "Birimler",
+    "categories": "Kategoriler",
+    "brands": "Markalar",
+    "addUser": "Kullanıcı Ekle",
+    "addUnit": "Birim Ekle",
+    "addCategory": "Kategori Ekle",
+    "addBrand": "Marka Ekle"
+  },
+  "forms": {
+    "name": "Ad",
+    "email": "E-posta",
+    "password": "Şifre",
+    "role": "Rol",
+    "description": "Açıklama",
+    "model": "Model",
+    "serialNumber": "Seri Numarası",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "back": "Geri",
+    "saving": "Kaydediliyor...",
+    "loading": "Yükleniyor...",
+    "required": "Bu alan zorunludur",
+    "categoryCode": "3 Harfli Kod",
+    "categoryCodePlaceholder": "LPT, PRT, vb."
+  },
+  "messages": {
+    "success": "İşlem başarılı",
+    "error": "Bir hata oluştu",
+    "deleteConfirm": "Bu öğeyi silmek istediğinizden emin misiniz?",
+    "noData": "Veri bulunamadı"
+  },
+  "login": {
+    "title": "Giriş Yap",
+    "email": "E-posta",
+    "password": "Şifre",
+    "signIn": "Giriş Yap",
+    "signingIn": "Giriş yapılıyor..."
+  }
+}

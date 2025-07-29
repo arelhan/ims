@@ -177,7 +177,7 @@ Herhangi bir sorun veya öneri için issue açabilirsiniz.
 
 ---
 
-**Geliştirici**: [Your Name]  
+**Geliştirici**: arelhan & github copilot 
 **Son Güncelleme**: 29 Temmuz 2025  
 **Versiyon**: 2.0.0 - Mobile First Update
 

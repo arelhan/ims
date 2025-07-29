@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
+import useTranslation from "@/hooks/useTranslation";
 import { 
   HomeIcon, 
   BuildingStorefrontIcon, 
@@ -15,29 +16,32 @@ import {
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
+  const params = useParams();
+  const { t } = useTranslation();
+  const locale = (params?.locale as string) || 'tr';
 
   const navItems = [
     {
-      name: "Anasayfa",
-      href: "/dashboard",
+      name: t('nav.home'),
+      href: `/${locale}/dashboard`,
       icon: HomeIcon,
       iconSolid: HomeIconSolid,
     },
     {
-      name: "Depo",
-      href: "/warehouse", 
+      name: t('nav.warehouse'),
+      href: `/${locale}/warehouse`, 
       icon: BuildingStorefrontIcon,
       iconSolid: BuildingStorefrontIconSolid,
     },
     {
-      name: "Envanter",
-      href: "/inventory",
+      name: t('nav.inventory'),
+      href: `/${locale}/inventory`,
       icon: ClipboardDocumentListIcon,
       iconSolid: ClipboardDocumentListIconSolid,
     },
     {
-      name: "Yönetim",
-      href: "/management",
+      name: t('nav.management'),
+      href: `/${locale}/management`,
       icon: Cog6ToothIcon,
       iconSolid: Cog6ToothIconSolid,
     },

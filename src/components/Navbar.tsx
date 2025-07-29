@@ -1,52 +1,59 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
+import useTranslation from "@/hooks/useTranslation";
+import LanguageSelector from "./LanguageSelector";
 
-const navItems = [
+const getNavItems = (locale: string, t: (key: string) => string) => [
   { 
-    href: "/dashboard", 
-    label: "Ana Sayfa", 
+    href: `/${locale}/dashboard`, 
+    label: t('nav.home'), 
     icon: "🏠",
-    description: "Genel görünüm"
+    description: t('dashboard.title')
   },
   { 
-    href: "/warehouse", 
-    label: "Depo", 
+    href: `/${locale}/warehouse`, 
+    label: t('nav.warehouse'), 
     icon: "🏢",
-    description: "Depo yönetimi"
+    description: t('warehouse.title')
   },
   { 
-    href: "/inventory", 
-    label: "Envanter", 
+    href: `/${locale}/inventory`, 
+    label: t('nav.inventory'), 
     icon: "📦",
-    description: "Varlık listesi"
+    description: t('inventory.title')
   },
   { 
-    href: "/decommissioned", 
-    label: "Arşiv", 
+    href: `/${locale}/decommissioned`, 
+    label: t('messages.archive'), 
     icon: "🗑️",
-    description: "Eski varlıklar"
+    description: t('messages.decomAssets')
   },
   { 
-    href: "/units", 
-    label: "Birimler", 
+    href: `/${locale}/units`, 
+    label: t('management.units'), 
     icon: "🏛️",
-    description: "Departmanlar"
+    description: t('management.units')
   },
   { 
-    href: "/management", 
-    label: "Yönetim", 
+    href: `/${locale}/management`, 
+    label: t('nav.management'), 
     icon: "⚙️",
-    description: "Sistem ayarları"
+    description: t('management.title')
   },
 ];
 
 export default function Navbar() {
   const pathname = usePathname();
+  const params = useParams();
+  const { t } = useTranslation();
+  const locale = (params?.locale as string) || 'tr';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  const navItems = getNavItems(locale, t);
 
   return (
     <>
@@ -154,10 +161,11 @@ export default function Navbar() {
           </Link>
         ))}
         <div className="flex-1" />
+        <LanguageSelector />
         <Link
-          href="/profile"
+          href={`/${locale}/profile`}
           className={`hover:underline transition flex items-center gap-2 ${
-            pathname === "/profile" ? "font-bold underline" : ""
+            pathname === `/${locale}/profile` ? "font-bold underline" : ""
           }`}
         >
           <span>👤</span>

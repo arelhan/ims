@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useParams, useRouter } from "next/navigation";
+import { useTranslation } from "../../../../hooks/useTranslation";
 
 type InventoryItem = {
   id: string;
@@ -74,7 +75,11 @@ const getCategoryIcon = (categoryName: string) => {
 export default function InventoryPage() {
   // URL parametrelerini kontrol et
   const searchParams = useSearchParams();
+  const params = useParams();
+  const router = useRouter();
+  const locale = params.locale as string;
   const categoryParam = searchParams.get('category');
+  const { t } = useTranslation();
 
   const [view, setView] = useState<'categories' | 'items'>('categories');
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
@@ -127,7 +132,7 @@ export default function InventoryPage() {
     <div className="max-w-6xl mx-auto mt-12 px-4">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Atanmış Envanterler</h1>
+          <h1 className="text-3xl font-bold text-gray-800">{t('inventory.assignedInventory')}</h1>
           {view === 'items' && selectedCategory && (
             <div className="flex items-center mt-2 text-sm text-gray-600">
               <button 
@@ -141,7 +146,7 @@ export default function InventoryPage() {
                 }}
                 className="hover:text-blue-600 hover:underline"
               >
-                Kategoriler
+                {t('inventory.categories')}
               </button>
               <span className="mx-2">{'>'}</span>
               <span className="font-medium">{selectedCategory.name}</span>
@@ -208,12 +213,12 @@ export default function InventoryPage() {
                         {category.name}
                       </h3>
                       <p className="text-sm text-gray-500 text-center">
-                        {itemCount} atanmış ürün
+                        {itemCount} {t('inventory.assignedProduct')}
                       </p>
                     </div>
                     <div className="bg-gray-50 px-6 py-3">
                       <div className="flex justify-between items-center text-sm">
-                        <span className="text-gray-600">Detay</span>
+                        <span className="text-gray-600">{t('inventory.details')}</span>
                         <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
@@ -230,10 +235,10 @@ export default function InventoryPage() {
         <div>
           <div className="mb-4">
             <h2 className="text-xl font-semibold text-gray-700">
-              {selectedCategory?.name} - Atanmış Ürünler
+              {selectedCategory?.name} - {t('inventory.assignedProducts')}
             </h2>
             <p className="text-gray-500 text-sm">
-              {filteredItems.length} atanmış ürün bulundu
+              {filteredItems.length} {t('inventory.assignedProductsFound')}
             </p>
           </div>
           {filteredItems.length === 0 ? (
@@ -241,7 +246,7 @@ export default function InventoryPage() {
               <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
               </svg>
-              <p className="text-lg">Bu kategoride atanmış ürün bulunmuyor</p>
+              <p className="text-lg">{t('inventory.noAssignedProducts')}</p>
             </div>
           ) : (
             <>
@@ -251,10 +256,10 @@ export default function InventoryPage() {
                   <table className="min-w-full">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ürün</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marka / Model</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Atanan Kişi</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Güncelleme</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('inventory.product')}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('inventory.brandModel')}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('inventory.assignedPerson')}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('inventory.lastUpdate')}</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -262,7 +267,7 @@ export default function InventoryPage() {
                         <tr 
                           key={item.id} 
                           className="hover:bg-gray-50 cursor-pointer transition-colors"
-                          onClick={() => window.open(`/inventory/${item.id}`, '_blank')}
+                          onClick={() => router.push(`/${locale}/inventory/${item.id}`)}
                         >
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
@@ -271,7 +276,7 @@ export default function InventoryPage() {
                               </div>
                               <div>
                                 <div className="text-sm font-medium text-gray-900">{item.name}</div>
-                                <div className="text-sm text-gray-500">{item.category?.name || 'Kategori yok'}</div>
+                                <div className="text-sm text-gray-500">{item.category?.name || t('inventory.noCategory')}</div>
                               </div>
                             </div>
                           </td>
@@ -300,7 +305,7 @@ export default function InventoryPage() {
                   <div 
                     key={item.id} 
                     className="card-mobile hover:shadow-md cursor-pointer transition-all"
-                    onClick={() => window.open(`/inventory/${item.id}`, '_blank')}
+                    onClick={() => router.push(`/${locale}/inventory/${item.id}`)}
                   >
                     <div className="flex items-start gap-3">
                       <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center text-green-600 flex-shrink-0">
@@ -308,22 +313,22 @@ export default function InventoryPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-medium text-gray-900 mb-1">{item.name}</div>
-                        <div className="text-sm text-gray-500 mb-2">{item.category?.name || 'Kategori yok'}</div>
+                        <div className="text-sm text-gray-500 mb-2">{item.category?.name || t('inventory.noCategory')}</div>
                         
                         <div className="grid grid-cols-1 gap-2 text-sm">
                           <div>
-                            <span className="text-gray-500">Marka:</span>
+                            <span className="text-gray-500">{t('inventory.brand')}:</span>
                             <span className="ml-2 text-gray-900">{item.brand?.name}</span>
                             {(item as any).model && (
                               <span className="ml-1 text-gray-500">({(item as any).model})</span>
                             )}
                           </div>
                           <div>
-                            <span className="text-gray-500">Atanan:</span>
+                            <span className="text-gray-500">{t('inventory.assignedPerson')}:</span>
                             <span className="ml-2 text-gray-900">{item.assignedTo?.name || "-"}</span>
                           </div>
                           <div>
-                            <span className="text-gray-500">Güncelleme:</span>
+                            <span className="text-gray-500">{t('inventory.lastUpdate')}:</span>
                             <span className="ml-2 text-gray-500">
                               {new Date(item.updatedAt).toLocaleDateString("tr-TR")}
                             </span>

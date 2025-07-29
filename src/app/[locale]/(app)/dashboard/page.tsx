@@ -3,6 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import useTranslation from "@/hooks/useTranslation";
+import LanguageSelector from "@/components/LanguageSelector";
 
 type DashboardStats = {
   totalUsers: number;
@@ -13,12 +15,13 @@ type DashboardStats = {
 };
 
 const DashboardPage = () => {
+  const { t } = useTranslation();
   // React Query ile data fetch
   const { data: users = [], isLoading: usersLoading } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
       const res = await fetch("/api/user");
-      if (!res.ok) throw new Error("Kullanıcılar alınamadı");
+      if (!res.ok) throw new Error(t('messages.error'));
       return res.json();
     },
   });
@@ -27,7 +30,7 @@ const DashboardPage = () => {
     queryKey: ['inventory'],
     queryFn: async () => {
       const res = await fetch("/api/inventory");
-      if (!res.ok) throw new Error("Envanter alınamadı");
+      if (!res.ok) throw new Error(t('messages.error'));
       return res.json();
     },
   });
@@ -78,7 +81,7 @@ const DashboardPage = () => {
       <div className="flex justify-center items-center py-12">
         <div className="flex flex-col items-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span className="mt-3 text-gray-600">Yükleniyor...</span>
+          <span className="mt-3 text-gray-600">{t('forms.loading')}</span>
         </div>
       </div>
     );
@@ -86,39 +89,42 @@ const DashboardPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="text-center md:text-left">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Ana Pano</h1>
-        <p className="text-gray-600">Sistem durumu ve özet bilgiler</p>
+      <div className="flex justify-between items-center">
+        <div className="text-center md:text-left">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{t('dashboard.title')}</h1>
+          <p className="text-gray-600">{t('dashboard.subtitle')}</p>
+        </div>
+        <LanguageSelector />
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard 
-          label="Toplam Kullanıcı" 
+          label={t('management.users')} 
           value={stats.totalUsers} 
           icon="👥"
           color="blue"
         />
         <StatCard 
-          label="Toplam Varlık" 
+          label={t('inventory.title')} 
           value={stats.totalAssets} 
           icon="📦"
           color="green"
         />
         <StatCard 
-          label="Depodaki Varlıklar" 
+          label={t('warehouse.title')} 
           value={stats.warehouseAssets} 
           icon="🏢"
           color="indigo"
         />
         <StatCard 
-          label="Düşük Stok Uyarısı" 
+          label={t('messages.lowStock', 'Düşük Stok Uyarısı')} 
           value={stats.lowStock} 
           icon="⚠️"
           color="red"
           warning 
         />
         <StatCard
-          label="Toplam Envanter Değeri"
+          label={t('messages.totalValue', 'Toplam Envanter Değeri')}
           value={`${(stats.totalValue).toLocaleString('tr-TR')} ₺`}
           icon="💰"
           color="yellow"
@@ -128,12 +134,12 @@ const DashboardPage = () => {
       
       {/* Hızlı erişim kartları */}
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-gray-900">Hızlı Erişim</h2>
+        <h2 className="text-xl font-semibold text-gray-900">{t('dashboard.quickAccess')}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <QuickActionCard
             href="/warehouse"
-            title="Yeni Varlık Ekle"
-            description="Sisteme yeni varlık kaydedin"
+            title={t('dashboard.addAsset')}
+            description={t('warehouse.addAsset')}
             icon="➕"
             color="blue"
           />
@@ -146,15 +152,15 @@ const DashboardPage = () => {
           />
           <QuickActionCard
             href="/decommissioned"
-            title="Arşiv"
-            description="Kullanım dışı varlıklar"
+            title={t('messages.archive', 'Arşiv')}
+            description={t('messages.decomAssets', 'Kullanım dışı varlıklar')}
             icon="📥"
             color="gray"
           />
           <QuickActionCard
             href="/management"
-            title="Yönetim Paneli"
-            description="Sistem ayarlarını yönetin"
+            title={t('management.title')}
+            description={t('dashboard.manageUsers')}
             icon="⚙️"
             color="purple"
           />

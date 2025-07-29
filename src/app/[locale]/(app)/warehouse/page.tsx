@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import QRCodeCanvas from "../../../components/QRCodeCanvas";
-import DynamicFields from "../../../components/DynamicFields";
+import QRCodeCanvas from "../../../../components/QRCodeCanvas";
+import DynamicFields from "../../../../components/DynamicFields";
 
 // Tipler
 type InventoryItem = {

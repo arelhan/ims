@@ -3,8 +3,9 @@
 import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import QRCodeCanvas from "../../../../components/QRCodeCanvas";
-import DynamicFields from "../../../../components/DynamicFields";
+import QRCodeCanvas from "../../../../../components/QRCodeCanvas";
+import DynamicFields from "../../../../../components/DynamicFields";
+import useTranslation from "@/hooks/useTranslation";
 
 type InventoryItem = {
   id: string;
@@ -32,6 +33,7 @@ export default function InventoryDetailPage() {
   const params = useParams();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const id =
     typeof params.id === "string"
       ? params.id
@@ -44,7 +46,7 @@ export default function InventoryDetailPage() {
     queryKey: ['inventory', id],
     queryFn: async () => {
       const res = await fetch(`/api/inventory?id=${id}`);
-      if (!res.ok) throw new Error("Ürün bulunamadı");
+      if (!res.ok) throw new Error(t('details.productNotFound'));
       return res.json();
     },
     enabled: !!id, // id varsa sorgu çalıştır
@@ -54,7 +56,7 @@ export default function InventoryDetailPage() {
     queryKey: ['users'],
     queryFn: async () => {
       const res = await fetch("/api/user");
-      if (!res.ok) throw new Error("Kullanıcılar alınamadı");
+      if (!res.ok) throw new Error(t('details.usersNotLoaded'));
       return res.json();
     },
   });
@@ -155,7 +157,7 @@ export default function InventoryDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("Bu ürünü hizmet dışı bırakmak istediğinizden emin misiniz? (Çöp kutusuna gönderilecek)")) return;
+    if (!window.confirm(t('details.deleteConfirmText'))) return;
     
     setDeleteLoading(true);
     try {
@@ -163,11 +165,11 @@ export default function InventoryDetailPage() {
         method: "DELETE",
       });
       
-      if (!res.ok) throw new Error("İşlem başarısız");
+      if (!res.ok) throw new Error(t('messages.error'));
       
       router.push("/inventory");
     } catch {
-      alert("Ürün hizmet dışı bırakılamadı");
+      alert(t('messages.error'));
     }
     setDeleteLoading(false);
   };
@@ -177,7 +179,7 @@ export default function InventoryDetailPage() {
       <div className="max-w-4xl mx-auto mt-12 px-4">
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span className="ml-2">Yükleniyor...</span>
+          <span className="ml-2">{t('details.loading')}</span>
         </div>
       </div>
     );
@@ -187,13 +189,13 @@ export default function InventoryDetailPage() {
     return (
       <div className="max-w-4xl mx-auto mt-12 px-4">
         <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
-          {error?.message || "Varlık bulunamadı"}
+          {error?.message || t('details.productNotFound')}
         </div>
         <button
           onClick={() => router.push('/inventory')}
           className="mt-4 text-blue-600 hover:text-blue-800 transition-colors"
         >
-          ← Geri Dön
+          ← {t('forms.back')}
         </button>
       </div>
     );
@@ -217,13 +219,13 @@ export default function InventoryDetailPage() {
   const getStatusText = (status: string) => {
     switch (status) {
       case "AVAILABLE":
-        return "Mevcut";
+        return t('inventory.available');
       case "ASSIGNED":
-        return "Atanmış";
+        return t('inventory.assigned');
       case "IN_SERVICE":
-        return "Kullanımda";
+        return t('inventory.inUse');
       case "DECOMMISSIONED":
-        return "Hizmet Dışı";
+        return t('inventory.outOfService');
       default:
         return status;
     }
@@ -265,7 +267,7 @@ export default function InventoryDetailPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 className="text-3xl font-bold text-gray-800">Ürün Detayı</h1>
+          <h1 className="text-3xl font-bold text-gray-800">{t('details.title')}</h1>
         </div>
       </div>
 
@@ -283,7 +285,7 @@ export default function InventoryDetailPage() {
                   {item.productCode || item.name}
                 </h2>
                 <p className="text-sm text-gray-500 mb-2">
-                  {item.description || 'Açıklama bulunmuyor'}
+                  {item.description || t('messages.noData')}
                 </p>
                 <div className="flex items-center gap-2 mb-2">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
@@ -296,55 +298,55 @@ export default function InventoryDetailPage() {
             {/* Details Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-1">Ürün Kodu</h3>
-                <p className="text-gray-900 font-mono">{item.productCode || 'N/A'}</p>
+                <h3 className="text-sm font-medium text-gray-700 mb-1">{t('details.productCode')}</h3>
+                <p className="text-gray-900 font-mono">{item.productCode || t('details.na')}</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-1">Seri Numarası</h3>
-                <p className="text-gray-900">{item.serialNumber || "Belirtilmemiş"}</p>
+                <h3 className="text-sm font-medium text-gray-700 mb-1">{t('details.serialNumber')}</h3>
+                <p className="text-gray-900">{item.serialNumber || t('details.serialNotSpecified')}</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-1">Kategori</h3>
-                <p className="text-gray-900">{item.category?.name || 'Kategori yok'}</p>
+                <h3 className="text-sm font-medium text-gray-700 mb-1">{t('details.category')}</h3>
+                <p className="text-gray-900">{item.category?.name || t('details.noCategory')}</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-1">Marka</h3>
-                <p className="text-gray-900">{item.brand?.name || 'Marka yok'}</p>
+                <h3 className="text-sm font-medium text-gray-700 mb-1">{t('details.brand')}</h3>
+                <p className="text-gray-900">{item.brand?.name || t('details.noBrand')}</p>
               </div>
               {item.model && (
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-1">Model</h3>
+                  <h3 className="text-sm font-medium text-gray-700 mb-1">{t('details.model')}</h3>
                   <p className="text-gray-900">{item.model}</p>
                 </div>
               )}
               {item.location && (
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-1">Konum</h3>
+                  <h3 className="text-sm font-medium text-gray-700 mb-1">{t('details.location')}</h3>
                   <p className="text-gray-900">{item.location}</p>
                 </div>
               )}
               {item.purchasePrice && (
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-1">Satın Alma Fiyatı</h3>
+                  <h3 className="text-sm font-medium text-gray-700 mb-1">{t('details.purchasePrice')}</h3>
                   <p className="text-gray-900">{item.purchasePrice.toLocaleString('tr-TR')} ₺</p>
                 </div>
               )}
               {item.condition && (
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-1">Fiziksel Durum</h3>
+                  <h3 className="text-sm font-medium text-gray-700 mb-1">{t('details.condition')}</h3>
                   <p className="text-gray-900 capitalize">{item.condition}</p>
                 </div>
               )}
               <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-1">Atanmış Kullanıcı</h3>
-                <p className="text-gray-900">{item.assignedTo?.name || "Atanmamış"}</p>
+                <h3 className="text-sm font-medium text-gray-700 mb-1">{t('details.assignedUser')}</h3>
+                <p className="text-gray-900">{item.assignedTo?.name || t('details.notAssigned')}</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-1">Oluşturulma</h3>
+                <h3 className="text-sm font-medium text-gray-700 mb-1">{t('details.createdAt')}</h3>
                 <p className="text-gray-900">{new Date(item.createdAt).toLocaleDateString("tr-TR")}</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-1">Güncelleme</h3>
+                <h3 className="text-sm font-medium text-gray-700 mb-1">{t('details.updatedAt')}</h3>
                 <p className="text-gray-900">{new Date(item.updatedAt).toLocaleDateString("tr-TR")}</p>
               </div>
             </div>
@@ -352,7 +354,7 @@ export default function InventoryDetailPage() {
             {/* Notes Section */}
             {item.notes && (
               <div className="mt-6 bg-blue-50 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-blue-700 mb-2">Notlar</h3>
+                <h3 className="text-sm font-medium text-blue-700 mb-2">{t('details.notes')}</h3>
                 <p className="text-blue-900">{item.notes}</p>
               </div>
             )}
@@ -361,7 +363,7 @@ export default function InventoryDetailPage() {
             {item.specifications && Object.keys(item.specifications).length > 0 && (
               <div className="mt-6">
                 <h3 className="text-lg font-semibold mb-4 text-gray-800">
-                  {item.category?.name} Özel Alanları
+                  {item.category?.name} {t('details.specialFields')}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {Object.entries(item.specifications).map(([key, value]) => (
@@ -378,7 +380,7 @@ export default function InventoryDetailPage() {
           {/* Actions Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="text-lg font-medium text-gray-800 mb-4">İşlemler</h3>
+              <h3 className="text-lg font-medium text-gray-800 mb-4">{t('details.actions')}</h3>
               <div className="space-y-3">
                 <button
                   onClick={() => setEditModal(true)}
@@ -387,7 +389,7 @@ export default function InventoryDetailPage() {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
-                  Düzenle
+                  {t('details.edit')}
                 </button>
                 <button
                   onClick={() => setQrModal(true)}
@@ -396,7 +398,7 @@ export default function InventoryDetailPage() {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                   </svg>
-                  QR Kodu
+                  {t('details.qrCode')}
                 </button>
                 <button
                   onClick={() => window.print()}
@@ -405,7 +407,7 @@ export default function InventoryDetailPage() {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zM9 9h6v2H9V9z" />
                   </svg>
-                  Yazdır
+                  {t('details.print')}
                 </button>
                 <button
                   onClick={handleDelete}
@@ -415,7 +417,7 @@ export default function InventoryDetailPage() {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
-                  {deleteLoading ? "İşleniyor..." : "Hizmet Dışı Bırak"}
+                  {deleteLoading ? t('details.processing') : t('details.decommissioned')}
                 </button>
               </div>
             </div>
@@ -428,15 +430,15 @@ export default function InventoryDetailPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-4">
             <div className="text-center">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">QR Kodu</h2>
+              <h2 className="text-xl font-bold text-gray-800 mb-4">{t('details.qrCode')}</h2>
               <div className="bg-gray-50 rounded-lg p-4 mb-4">
                 <QRCodeCanvas
                   value={JSON.stringify({
                     itemId: item.id,
                     productCode: item.productCode || item.name,
                     itemName: item.name,
-                    category: item.category?.name || 'Kategori yok',
-                    brand: item.brand?.name || 'Marka yok',
+                    category: item.category?.name || t('details.noCategory'),
+                    brand: item.brand?.name || t('details.noBrand'),
                     serialNumber: item.serialNumber,
                     assignedTo: item.assignedTo?.name,
                     status: item.status,
@@ -445,7 +447,7 @@ export default function InventoryDetailPage() {
                   size={200}
                 />
                 <p className="text-xs text-gray-500 mt-2">
-                  Bu QR kodu ürün bilgilerini içerir
+                  {t('details.qrContainsInfo')}
                 </p>
               </div>
               <div className="flex gap-3">
@@ -461,13 +463,13 @@ export default function InventoryDetailPage() {
                     }
                   }}
                 >
-                  İndir
+                  {t('details.download')}
                 </button>
                 <button
                   className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50"
                   onClick={() => setQrModal(false)}
                 >
-                  Kapat
+                  {t('details.close')}
                 </button>
               </div>
             </div>
@@ -479,7 +481,7 @@ export default function InventoryDetailPage() {
       {editModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg mx-4">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Ürün Düzenle</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">{t('details.editProduct')}</h2>
             
             {editError && (
               <div className="bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded mb-4">
@@ -491,20 +493,20 @@ export default function InventoryDetailPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Ürün Kodu
+                    {t('details.productCode')}
                   </label>
                   <input
                     type="text"
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-50"
-                    value={editForm.productCode || item.productCode || "N/A"}
+                    value={editForm.productCode || item.productCode || t('details.na')}
                     disabled
                   />
-                  <p className="text-xs text-gray-500 mt-1">Ürün kodu değiştirilemez</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('details.productCodeCannotChange')}</p>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Açıklama
+                    {t('details.description')}
                   </label>
                   <textarea
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -518,7 +520,7 @@ export default function InventoryDetailPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Seri Numarası
+                      {t('details.serialNumber')}
                     </label>
                     <input
                       type="text"
@@ -530,7 +532,7 @@ export default function InventoryDetailPage() {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Model
+                      {t('details.model')}
                     </label>
                     <input
                       type="text"
@@ -544,7 +546,7 @@ export default function InventoryDetailPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Konum
+                      {t('details.location')}
                     </label>
                     <input
                       type="text"

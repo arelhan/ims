@@ -2,8 +2,8 @@
 import { SessionProvider } from "next-auth/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
-import Navbar from "../../components/Navbar";
-import MobileBottomNav from "../../components/MobileBottomNav";
+import Navbar from "../../../components/Navbar";
+import MobileBottomNav from "../../../components/MobileBottomNav";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
