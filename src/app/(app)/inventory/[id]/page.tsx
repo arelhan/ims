@@ -69,7 +69,6 @@ export default function InventoryDetailPage() {
     assignedToId: "",
     location: "",
     purchasePrice: "",
-    supplier: "",
     model: "",
     condition: "",
     notes: "",
@@ -91,7 +90,6 @@ export default function InventoryDetailPage() {
         assignedToId: item.assignedTo?.id || "",
         location: item.location || "",
         purchasePrice: item.purchasePrice?.toString() || "",
-        supplier: item.supplier || "",
         model: item.model || "",
         condition: item.condition || "",
         notes: item.notes || "",
@@ -129,7 +127,6 @@ export default function InventoryDetailPage() {
         assignedToId: finalAssignedToId,
         location: editForm.location,
         purchasePrice: editForm.purchasePrice ? parseFloat(editForm.purchasePrice) : undefined,
-        supplier: editForm.supplier,
         model: editForm.model,
         condition: editForm.condition,
         notes: editForm.notes,
@@ -193,8 +190,8 @@ export default function InventoryDetailPage() {
           {error?.message || "Varlık bulunamadı"}
         </div>
         <button
-          onClick={() => router.back()}
-          className="mt-4 text-blue-600 hover:text-blue-800"
+          onClick={() => router.push('/inventory')}
+          className="mt-4 text-blue-600 hover:text-blue-800 transition-colors"
         >
           ← Geri Dön
         </button>
@@ -261,8 +258,8 @@ export default function InventoryDetailPage() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => router.back()}
-            className="text-gray-500 hover:text-gray-700"
+            onClick={() => router.push('/inventory')}
+            className="text-gray-500 hover:text-gray-700 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -330,12 +327,6 @@ export default function InventoryDetailPage() {
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="text-sm font-medium text-gray-700 mb-1">Satın Alma Fiyatı</h3>
                   <p className="text-gray-900">{item.purchasePrice.toLocaleString('tr-TR')} ₺</p>
-                </div>
-              )}
-              {item.supplier && (
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-1">Tedarikçi</h3>
-                  <p className="text-gray-900">{item.supplier}</p>
                 </div>
               )}
               {item.condition && (
@@ -582,18 +573,6 @@ export default function InventoryDetailPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Tedarikçi
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      value={editForm.supplier}
-                      onChange={(e) => setEditForm({ ...editForm, supplier: e.target.value })}
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       Durum
                     </label>
                     <select
@@ -692,6 +671,64 @@ export default function InventoryDetailPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* QR Code Modal */}
+      {qrModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-800">QR Kod</h2>
+              <button
+                onClick={() => setQrModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="text-center">
+              <div className="mb-4 flex justify-center">
+                <QRCodeCanvas 
+                  value={`${window.location.origin}/info/${item?.productCode}`}
+                  size={200} 
+                  className="border border-gray-200 rounded-lg"
+                />
+              </div>
+              
+              <div className="space-y-2 text-sm text-gray-600">
+                <p>
+                  <span className="font-medium">Ürün Kodu:</span><br />
+                  <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                    {item?.productCode}
+                  </span>
+                </p>
+                <p>
+                  <span className="font-medium">Bilgi Sayfası:</span><br />
+                  <a 
+                    href={`${window.location.origin}/info/${item?.productCode}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono bg-blue-50 px-2 py-1 rounded text-blue-700 text-xs break-all hover:bg-blue-100 hover:text-blue-800 transition-colors cursor-pointer underline"
+                  >
+                    {window.location.origin}/info/{item?.productCode}
+                  </a>
+                </p>
+              </div>
+              
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => setQrModal(false)}
+                  className="w-full bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
+                >
+                  Kapat
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

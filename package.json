@@ -11,9 +11,14 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed",
+    "seed": "tsx prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@prisma/client": "^6.12.0",
     "@tanstack/react-query": "^5.83.0",
     "@types/qrcode": "^1.5.5",
@@ -33,6 +38,7 @@
     "@types/node": "24.1.0",
     "@types/react": "19.1.8",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.3",
     "typescript": "5.8.3"
   }
 }

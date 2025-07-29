@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import QRCodeCanvas from "../../../components/QRCodeCanvas";
 import DynamicFields from "../../../components/DynamicFields";
 
@@ -60,6 +62,11 @@ const getCategoryIcon = (categoryName: string) => {
 };
 
 export default function WarehousePage() {
+  // URL parametrelerini kontrol et
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get('category');
+  const queryClient = useQueryClient();
+
   // State
   const [view, setView] = useState<'categories' | 'items'>('categories');
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
@@ -80,7 +87,6 @@ export default function WarehousePage() {
     serialNumber: "",
     location: "",
     purchasePrice: "",
-    supplier: "",
     model: "",
     condition: "",
     notes: "",
@@ -140,6 +146,17 @@ export default function WarehousePage() {
     fetchData();
   }, []);
 
+  // URL parametresine göre kategori seçimi yap
+  useEffect(() => {
+    if (categoryParam && categories.length > 0) {
+      const category = categories.find(cat => cat.id === categoryParam);
+      if (category) {
+        setSelectedCategory(category);
+        setView('items');
+      }
+    }
+  }, [categoryParam, categories]);
+
   // Category selection for modal
   function handleCategorySelect(category: Category) {
     setSelectedCategoryForModal(category);
@@ -165,7 +182,6 @@ export default function WarehousePage() {
       serialNumber: "",
       location: "",
       purchasePrice: "",
-      supplier: "",
       model: "",
       condition: "",
       notes: "",
@@ -189,7 +205,6 @@ export default function WarehousePage() {
           serialNumber: form.serialNumber,
           location: form.location,
           purchasePrice: form.purchasePrice ? parseFloat(form.purchasePrice) : undefined,
-          supplier: form.supplier,
           model: form.model,
           condition: form.condition,
           notes: form.notes,
@@ -202,6 +217,10 @@ export default function WarehousePage() {
       }
       // Successfully added, update list
       const newItem = await res.json();
+      
+      // React Query cache'ini güncelle
+      queryClient.invalidateQueries({ queryKey: ['inventory'] });
+      
       setItems((prev) => [...prev, newItem]);
       closeModal();
     } catch (err: any) {
@@ -263,6 +282,9 @@ export default function WarehousePage() {
         setShowSuccessModal(true);
       }
       
+      // React Query cache'ini güncelle
+      queryClient.invalidateQueries({ queryKey: ['inventory'] });
+      
       setItems((prev) => prev.filter((i) => i.id !== selectedItem.id));
       closeAssignModal();
     } catch (err: any) {
@@ -283,7 +305,14 @@ export default function WarehousePage() {
           {view === 'items' && selectedCategory && (
             <div className="flex items-center mt-2 text-sm text-gray-600">
               <button 
-                onClick={() => setView('categories')}
+                onClick={() => {
+                  setView('categories');
+                  setSelectedCategory(null);
+                  // URL'den category parametresini kaldır
+                  const url = new URL(window.location.href);
+                  url.searchParams.delete('category');
+                  window.history.pushState({}, '', url.toString());
+                }}
                 className="hover:text-blue-600 hover:underline"
               >
                 Kategoriler
@@ -297,7 +326,20 @@ export default function WarehousePage() {
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold flex items-center gap-2 shadow-md"
           onClick={() => {
             setShowModal(true);
-            setModalStep('category');
+            // Eğer kategori seçili ise direkt form adımına git
+            if (selectedCategory) {
+              setSelectedCategoryForModal(selectedCategory);
+              setForm(prev => ({
+                ...prev,
+                categoryId: selectedCategory.id,
+                brandId: brands[0]?.id || "",
+                specifications: {}
+              }));
+              setModalStep('form');
+            } else {
+              // Kategori seçili değil ise kategori seçim adımına git
+              setModalStep('category');
+            }
           }}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -325,7 +367,13 @@ export default function WarehousePage() {
             // Categories view
             <div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {categories.map((category) => {
+                {categories
+                  .filter(category => {
+                    // Sadece depoda ürünü olan kategorileri göster
+                    const categoryItems = items.filter(item => item.category.id === category.id);
+                    return categoryItems.length > 0;
+                  })
+                  .map((category) => {
                   const categoryItems = items.filter(item => item.category.id === category.id);
                   return (
                     <div
@@ -334,6 +382,10 @@ export default function WarehousePage() {
                       onClick={() => {
                         setSelectedCategory(category);
                         setView('items');
+                        // URL'yi güncelle
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('category', category.id);
+                        window.history.pushState({}, '', url.toString());
                       }}
                     >
                       <div className="flex items-center justify-between mb-4">
@@ -403,17 +455,35 @@ export default function WarehousePage() {
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-white rounded shadow-lg p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto relative">
-            <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-              onClick={closeModal}
-            >
-              ×
-            </button>
+            {/* Modal Header with Back Button */}
+            <div className="flex items-center justify-between mb-6">
+              {modalStep === 'form' && (
+                <button
+                  onClick={() => setModalStep('category')}
+                  className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  Geri
+                </button>
+              )}
+              <h2 className="text-2xl font-bold flex-1">
+                {modalStep === 'category' ? 'Kategori Seçin' : `Yeni Varlık Ekle - ${selectedCategoryForModal?.name}`}
+              </h2>
+              <button
+                className="text-gray-500 hover:text-gray-700 ml-4"
+                onClick={closeModal}
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
             
             {modalStep === 'category' ? (
               // Step 1: Category Selection
               <div>
-                <h2 className="text-2xl font-bold mb-6">Kategori Seçin</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {categories.map((category) => (
                     <button
@@ -438,18 +508,6 @@ export default function WarehousePage() {
             ) : (
               // Step 2: Form
               <div>
-                <div className="flex items-center mb-6">
-                  <button
-                    onClick={() => setModalStep('category')}
-                    className="text-blue-600 hover:text-blue-800 mr-4"
-                  >
-                    ← Geri
-                  </button>
-                  <h2 className="text-xl font-bold">
-                    Yeni {selectedCategoryForModal?.name} Ekle
-                  </h2>
-                </div>
-                
                 <form onSubmit={handleAddAsset} className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -507,6 +565,20 @@ export default function WarehousePage() {
                       </select>
                     </div>
                     <div>
+                      <label className="block mb-1 font-medium">Model</label>
+                      <input
+                        type="text"
+                        className="w-full border border-gray-300 px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        value={form.model}
+                        onChange={(e) =>
+                          setForm((f) => ({ ...f, model: e.target.value }))
+                        }
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
                       <label className="block mb-1 font-medium">Konum</label>
                       <input
                         type="text"
@@ -518,9 +590,6 @@ export default function WarehousePage() {
                         placeholder="Raf/Bölüm"
                       />
                     </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block mb-1 font-medium">Satın Alma Fiyatı</label>
                       <input
@@ -534,31 +603,9 @@ export default function WarehousePage() {
                         placeholder="0.00"
                       />
                     </div>
-                    <div>
-                      <label className="block mb-1 font-medium">Tedarikçi</label>
-                      <input
-                        type="text"
-                        className="w-full border border-gray-300 px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        value={form.supplier}
-                        onChange={(e) =>
-                          setForm((f) => ({ ...f, supplier: e.target.value }))
-                        }
-                      />
-                    </div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block mb-1 font-medium">Model</label>
-                      <input
-                        type="text"
-                        className="w-full border border-gray-300 px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        value={form.model}
-                        onChange={(e) =>
-                          setForm((f) => ({ ...f, model: e.target.value }))
-                        }
-                      />
-                    </div>
                     <div>
                       <label className="block mb-1 font-medium">Durum</label>
                       <select

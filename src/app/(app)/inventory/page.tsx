@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 
 type InventoryItem = {
   id: string;
@@ -9,6 +10,7 @@ type InventoryItem = {
   category: { id: string; name: string };
   brand: { name: string };
   serialNumber?: string;
+  model?: string;
   assignedTo?: { name: string };
   updatedAt: string;
 };
@@ -70,6 +72,10 @@ const getCategoryIcon = (categoryName: string) => {
 };
 
 export default function InventoryPage() {
+  // URL parametrelerini kontrol et
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get('category');
+
   const [view, setView] = useState<'categories' | 'items'>('categories');
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
@@ -102,6 +108,17 @@ export default function InventoryPage() {
   const loading = itemsLoading || categoriesLoading;
   const error = itemsError || categoriesError;
 
+  // URL parametresine göre kategori seçimi yap
+  useEffect(() => {
+    if (categoryParam && categories.length > 0) {
+      const category = categories.find(cat => cat.id === categoryParam);
+      if (category) {
+        setSelectedCategory(category);
+        setView('items');
+      }
+    }
+  }, [categoryParam, categories]);
+
   const filteredItems = selectedCategory 
     ? items.filter(item => item.category && item.category.id === selectedCategory.id)
     : items;
@@ -114,7 +131,14 @@ export default function InventoryPage() {
           {view === 'items' && selectedCategory && (
             <div className="flex items-center mt-2 text-sm text-gray-600">
               <button 
-                onClick={() => setView('categories')}
+                onClick={() => {
+                  setView('categories');
+                  setSelectedCategory(null);
+                  // URL'den category parametresini kaldır
+                  const url = new URL(window.location.href);
+                  url.searchParams.delete('category');
+                  window.history.pushState({}, '', url.toString());
+                }}
                 className="hover:text-blue-600 hover:underline"
               >
                 Kategoriler
@@ -153,7 +177,13 @@ export default function InventoryPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {categories.map((category) => {
+              {categories
+                .filter(category => {
+                  // Sadece atanmış ürünü olan kategorileri göster
+                  const categoryItems = items.filter(item => item.category && item.category.id === category.id);
+                  return categoryItems.length > 0;
+                })
+                .map((category) => {
                 const categoryItems = items.filter(item => item.category && item.category.id === category.id);
                 const itemCount = categoryItems.length;
                 
@@ -163,6 +193,10 @@ export default function InventoryPage() {
                     onClick={() => {
                       setSelectedCategory(category);
                       setView('items');
+                      // URL'yi güncelle
+                      const url = new URL(window.location.href);
+                      url.searchParams.set('category', category.id);
+                      window.history.pushState({}, '', url.toString());
                     }}
                     className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer border border-gray-200 overflow-hidden"
                   >
@@ -210,59 +244,102 @@ export default function InventoryPage() {
               <p className="text-lg">Bu kategoride atanmış ürün bulunmuyor</p>
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="min-w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ürün</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marka</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Seri No</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Atanan Kişi</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Güncelleme</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">İşlemler</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredItems.map((item) => (
-                      <tr key={item.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3 text-green-600">
-                              {getCategoryIcon(item.category?.name || 'default')}
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium text-gray-900">{item.name}</div>
-                              <div className="text-sm text-gray-500">{item.category?.name || 'Kategori yok'}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {item.brand?.name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {item.serialNumber || "-"}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{item.assignedTo?.name || "-"}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(item.updatedAt).toLocaleDateString("tr-TR")}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button
-                            className="text-blue-600 hover:text-blue-800"
-                            onClick={() => window.open(`/inventory/${item.id}`, '_blank')}
-                          >
-                            Detay
-                          </button>
-                        </td>
+            <>
+              {/* Desktop Table View */}
+              <div className="hidden md:block bg-white rounded-lg shadow-md overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ürün</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marka / Model</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Atanan Kişi</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Güncelleme</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {filteredItems.map((item) => (
+                        <tr 
+                          key={item.id} 
+                          className="hover:bg-gray-50 cursor-pointer transition-colors"
+                          onClick={() => window.open(`/inventory/${item.id}`, '_blank')}
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3 text-green-600">
+                                {getCategoryIcon(item.category?.name || 'default')}
+                              </div>
+                              <div>
+                                <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                                <div className="text-sm text-gray-500">{item.category?.name || 'Kategori yok'}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">{item.brand?.name}</div>
+                            {(item as any).model && (
+                              <div className="text-sm text-gray-500">{(item as any).model}</div>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">{item.assignedTo?.name || "-"}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {new Date(item.updatedAt).toLocaleDateString("tr-TR")}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
+
+              {/* Mobile Card View */}
+              <div className="md:hidden space-y-4">
+                {filteredItems.map((item) => (
+                  <div 
+                    key={item.id} 
+                    className="card-mobile hover:shadow-md cursor-pointer transition-all"
+                    onClick={() => window.open(`/inventory/${item.id}`, '_blank')}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center text-green-600 flex-shrink-0">
+                        {getCategoryIcon(item.category?.name || 'default')}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-gray-900 mb-1">{item.name}</div>
+                        <div className="text-sm text-gray-500 mb-2">{item.category?.name || 'Kategori yok'}</div>
+                        
+                        <div className="grid grid-cols-1 gap-2 text-sm">
+                          <div>
+                            <span className="text-gray-500">Marka:</span>
+                            <span className="ml-2 text-gray-900">{item.brand?.name}</span>
+                            {(item as any).model && (
+                              <span className="ml-1 text-gray-500">({(item as any).model})</span>
+                            )}
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Atanan:</span>
+                            <span className="ml-2 text-gray-900">{item.assignedTo?.name || "-"}</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Güncelleme:</span>
+                            <span className="ml-2 text-gray-500">
+                              {new Date(item.updatedAt).toLocaleDateString("tr-TR")}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-gray-400">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       )}

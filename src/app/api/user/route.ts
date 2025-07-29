@@ -11,12 +11,38 @@ import bcrypt from "bcryptjs";
 import { UserRole } from "@prisma/client";
 
 // Kullanıcı oluşturma ve güncelleme için Zod şeması
-const userSchema = z.object({
+const createUserSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(6).optional(), // Güncellemede zorunlu değil
+  password: z.string().min(6),
   name: z.string().min(1),
   role: z.nativeEnum(UserRole).optional(),
   unitId: z.string().optional().nullable(),
+}).refine((data) => {
+  // Admin değilse unitId zorunlu
+  if (data.role !== UserRole.ADMIN && !data.unitId) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Admin olmayan kullanıcılar için birim seçimi zorunludur",
+  path: ["unitId"]
+});
+
+const updateUserSchema = z.object({
+  email: z.string().email().optional(),
+  password: z.string().min(6).optional(),
+  name: z.string().min(1).optional(),
+  role: z.nativeEnum(UserRole).optional(),
+  unitId: z.string().optional().nullable(),
+}).refine((data) => {
+  // Eğer role güncelleniyor ve ADMIN değilse, unitId olmalı
+  if (data.role && data.role !== UserRole.ADMIN && !data.unitId) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Admin olmayan kullanıcılar için birim seçimi zorunludur",
+  path: ["unitId"]
 });
 
 // GET /api/user - Tüm kullanıcıları getir veya id ile tek kullanıcı getir
@@ -58,7 +84,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const parsed = userSchema.required({ password: true }).safeParse(body);
+    const parsed = createUserSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Geçersiz veri", details: parsed.error.issues },
@@ -86,7 +112,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "ID gerekli" }, { status: 400 });
     }
     const body = await req.json();
-    const parsed = userSchema.partial().safeParse(body);
+    const parsed = updateUserSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Geçersiz veri", details: parsed.error.issues },

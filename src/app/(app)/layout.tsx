@@ -3,6 +3,7 @@ import { SessionProvider } from "next-auth/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import Navbar from "../../components/Navbar";
+import MobileBottomNav from "../../components/MobileBottomNav";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
@@ -25,8 +26,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         refetchOnWindowFocus={false} // Pencere focus olduğunda yenileme
         refetchWhenOffline={false} // Offline durumda yenileme
       >
-        <Navbar />
-        {children}
+        <div className="min-h-screen bg-gray-50">
+          <Navbar />
+          <main className="container-mobile pb-16 md:pb-0">
+            {children}
+          </main>
+          <MobileBottomNav />
+        </div>
       </SessionProvider>
     </QueryClientProvider>
   );

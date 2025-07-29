@@ -24,7 +24,6 @@ const inventorySchema = z.object({
   purchaseDate: z.string().optional().transform(val => val ? new Date(val) : undefined),
   purchasePrice: z.number().optional(),
   warrantyDate: z.string().optional().transform(val => val ? new Date(val) : undefined),
-  supplier: z.string().optional(),
   model: z.string().optional(),
   specifications: z.any().optional(),
   notes: z.string().optional(),
