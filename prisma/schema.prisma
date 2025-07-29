@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum InventoryStatus {
+  AVAILABLE
+  ASSIGNED
+  DECOMMISSIONED
+  IN_SERVICE
+  ARCHIVED
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  name      String
+  role      UserRole  @default(USER)
+  unit      Unit?     @relation(fields: [unitId], references: [id])
+  unitId    String?
+  assets    Inventory[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Unit {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id              String      @id @default(uuid())
+  name            String      @unique
+  code            String      @unique
+  fieldTemplate   Json?       // Her kategori için özel alanlar şablonu
+  assets          Inventory[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model Brand {
+  id        String      @id @default(uuid())
+  name      String      @unique
+  assets    Inventory[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Inventory {
+  id             String           @id @default(uuid())
+  name           String
+  description    String?
+  serialNumber   String?          @unique
+  productCode    String?          @unique
+  status         InventoryStatus  @default(AVAILABLE)
+  category       Category         @relation(fields: [categoryId], references: [id])
+  categoryId     String
+  brand          Brand            @relation(fields: [brandId], references: [id])
+  brandId        String
+  assignedTo     User?            @relation(fields: [assignedToId], references: [id])
+  assignedToId   String?
+  // Ekstra alanlar
+  location       String?          // Fiziksel konum/raf bilgisi
+  purchaseDate   DateTime?        // Satın alınan tarih
+  purchasePrice  Float?           // Satın alma fiyatı
+  warrantyDate   DateTime?        // Garanti bitiş tarihi
+  supplier       String?          // Tedarikçi bilgisi
+  model          String?          // Model numarası
+  specifications Json?            // Teknik özellikler (JSON formatında)
+  notes          String?          // Ek notlar
+  barcode        String?          @unique // Barkod
+  condition      String?          // Durum (Yeni, İyi, Orta, Kötü)
+  decommissioned Decommissioned?
+  serviceRecords ServiceRecord[]
+  auditTrail     AuditTrail[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model Decommissioned {
+  id          String     @id @default(uuid())
+  inventory   Inventory  @relation(fields: [inventoryId], references: [id])
+  inventoryId String     @unique
+  reason      String?
+  date        DateTime   @default(now())
+}
+
+model ServiceRecord {
+  id          String     @id @default(uuid())
+  inventory   Inventory  @relation(fields: [inventoryId], references: [id])
+  inventoryId String
+  description String
+  date        DateTime   @default(now())
+}
+
+model AuditTrail {
+  id          String     @id @default(uuid())
+  inventory   Inventory  @relation(fields: [inventoryId], references: [id])
+  inventoryId String
+  action      String
+  performedBy String
+  date        DateTime   @default(now())
+}
