@@ -202,21 +202,45 @@ npm install
 
 ## 12. Git Repository Oluşturma
 
-Eğer henüz git repository'si yoksa:
+### GitHub'da Repository Oluşturma:
+1. GitHub'a git: https://github.com
+2. "New repository" butonuna tıkla
+3. Repository adı: `ims` veya `inventory-management-system`
+4. Description: "Modern Inventory Management System with product codes and QR system"
+5. Public veya Private seç
+6. "Create repository" tıkla
 
+### Local'den GitHub'a Push:
 ```bash
-# Git başlat
-git init
+# GitHub repository URL'ini ekle (GitHub'dan kopyala)
+git remote add origin https://github.com/username/repository-name.git
 
-# Dosyaları ekle
-git add .
-
-# İlk commit
-git commit -m "Initial commit: IMS with product code system and two-step modal"
-
-# GitHub/GitLab'a push et
-git remote add origin [REPOSITORY_URL]
+# Ana branch'i push et
 git push -u origin main
+
+# Gelecekte sadece:
+git push
+```
+
+### Repository Hazır! Şimdi:
+```bash
+# Eve gidince projeyi indir:
+git clone https://github.com/username/repository-name.git
+cd repository-name
+
+# Bağımlılıkları kur
+npm install
+
+# .env dosyasını oluştur ve düzenle
+cp .env.example .env
+# .env dosyasını kendi bilgilerinle güncelle
+
+# Veritabanını ayarla
+npx prisma generate
+npx prisma db push
+
+# Çalıştır
+npm run dev
 ```
 
 ## 13. İletişim ve Destek
