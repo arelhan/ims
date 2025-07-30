@@ -9,15 +9,19 @@ const languages = [
   { code: 'sq', name: 'Shqip', flag: '🇦🇱' }
 ];
 
-export default function LanguageSelector() {
+export default function LanguageSelector({ darkMode = false }: { darkMode?: boolean }) {
   const { locale, changeLanguage } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const currentLanguage = languages.find(lang => lang.code === locale) || languages[0];
 
+  const buttonClasses = darkMode 
+    ? "flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 hover:bg-opacity-20 transition-colors text-white"
+    : "flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-700";
+
   return (
     <div className="relative group">
-      <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 hover:bg-opacity-20 transition-colors text-white">
+      <button className={buttonClasses}>
         <span className="text-sm">
           {languages.find(lang => lang.code === locale)?.flag}
         </span>

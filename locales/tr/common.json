@@ -1,4 +1,19 @@
 {
+  "home": {
+    "description": "BT departmanları için modern, güvenli ve kapsamlı bir envanter yönetim sistemi.",
+    "loginButton": "Giriş Yap"
+  },
+  "login": {
+    "welcome": "Hoş Geldiniz",
+    "subtitle": "Envanter Yönetim Sistemine giriş yapın",
+    "email": "E-posta",
+    "emailPlaceholder": "ornek@email.com",
+    "password": "Şifre",
+    "loginButton": "Giriş Yap",
+    "loggingIn": "Giriş yapılıyor...",
+    "invalidCredentials": "Geçersiz email veya şifre",
+    "genericError": "Bir hata oluştu"
+  },
   "nav": {
     "home": "Anasayfa",
     "warehouse": "Depo",
@@ -75,12 +90,5 @@
     "error": "Bir hata oluştu",
     "deleteConfirm": "Bu öğeyi silmek istediğinizden emin misiniz?",
     "noData": "Veri bulunamadı"
-  },
-  "login": {
-    "title": "Giriş Yap",
-    "email": "E-posta",
-    "password": "Şifre",
-    "signIn": "Giriş Yap",
-    "signingIn": "Giriş yapılıyor..."
   }
 }

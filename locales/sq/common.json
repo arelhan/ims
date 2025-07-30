@@ -1,4 +1,19 @@
 {
+  "home": {
+    "description": "Sistem modern, i sigurt dhe gjithëpërfshirës i menaxhimit të inventarit për departamentet e IT-së.",
+    "loginButton": "Hyni"
+  },
+  "login": {
+    "welcome": "Mirësevini",
+    "subtitle": "Hyni në Sistemin e Menaxhimit të Inventarit",
+    "email": "Email",
+    "emailPlaceholder": "shembull@email.com",
+    "password": "Fjalëkalimi",
+    "loginButton": "Hyni",
+    "loggingIn": "Duke hyrë...",
+    "invalidCredentials": "Email ose fjalëkalim i pavlefshëm",
+    "genericError": "Ndodhi një gabim"
+  },
   "nav": {
     "home": "Shtëpia",
     "warehouse": "Depo",
@@ -75,12 +90,5 @@
     "error": "Ndodhi një gabim",
     "deleteConfirm": "Jeni i sigurt që doni të fshini këtë element?",
     "noData": "Nuk u gjetën të dhëna"
-  },
-  "login": {
-    "title": "Hyni",
-    "email": "Email",
-    "password": "Fjalëkalimi",
-    "signIn": "Hyni",
-    "signingIn": "Duke hyrë..."
   }
 }

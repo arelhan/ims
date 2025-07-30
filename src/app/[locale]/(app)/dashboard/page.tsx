@@ -3,247 +3,192 @@
 import React from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import useTranslation from "@/hooks/useTranslation";
-import LanguageSelector from "@/components/LanguageSelector";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useSession } from "next-auth/react";
 
-type DashboardStats = {
-  totalUsers: number;
-  totalAssets: number;
-  warehouseAssets: number;
-  lowStock: number;
-  totalValue: number;
-};
-
-const DashboardPage = () => {
-  const { t } = useTranslation();
-  // React Query ile data fetch
-  const { data: users = [], isLoading: usersLoading } = useQuery({
-    queryKey: ['users'],
-    queryFn: async () => {
-      const res = await fetch("/api/user");
-      if (!res.ok) throw new Error(t('messages.error'));
-      return res.json();
-    },
-  });
-
-  const { data: inventoryItems = [], isLoading: inventoryLoading } = useQuery({
-    queryKey: ['inventory'],
-    queryFn: async () => {
-      const res = await fetch("/api/inventory");
-      if (!res.ok) throw new Error(t('messages.error'));
-      return res.json();
-    },
-  });
-
-  const loading = usersLoading || inventoryLoading;
-
-  // Stats hesapla
-  const stats: DashboardStats = React.useMemo(() => {
-    if (loading) return { totalUsers: 0, totalAssets: 0, warehouseAssets: 0, lowStock: 0, totalValue: 0 };
-
-    // Toplam varlık - sadece aktif durumda olanlar (AVAILABLE ve ASSIGNED)
-    const totalAssets = inventoryItems.filter(
-      (item: any) => 
-        item.status === "AVAILABLE" || item.status === "ASSIGNED"
-    ).length;
-
-    // Depodaki varlıklar (assignedToId: null ve status: AVAILABLE)
-    const warehouseAssets = inventoryItems.filter(
-      (item: any) =>
-        (!("assignedToId" in item) || item.assignedToId === null) &&
-        item.status === "AVAILABLE",
-    ).length;
-
-    // Düşük stok (aynı kategori ve marka için 3 veya daha az olanlar)
-    const stockMap: Record<string, number> = {};
-    for (const item of inventoryItems) {
-      const key = (item.category?.id || "") + "-" + (item.brand?.id || "");
-      stockMap[key] = (stockMap[key] || 0) + 1;
-    }
-    const lowStock = Object.values(stockMap).filter(
-      (count) => count <= 3,
-    ).length;
-
-    // Toplam değer (örnek: birim fiyat yoksa toplam varlık sayısı * 10000 ₺)
-    const totalValue = totalAssets * 10000;
-
-    return {
-      totalUsers: users.length,
-      totalAssets,
-      warehouseAssets,
-      lowStock,
-      totalValue,
-    };
-  }, [users, inventoryItems, loading]);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span className="mt-3 text-gray-600">{t('forms.loading')}</span>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div className="text-center md:text-left">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{t('dashboard.title')}</h1>
-          <p className="text-gray-600">{t('dashboard.subtitle')}</p>
-        </div>
-        <LanguageSelector />
-      </div>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <StatCard 
-          label={t('management.users')} 
-          value={stats.totalUsers} 
-          icon="👥"
-          color="blue"
-        />
-        <StatCard 
-          label={t('inventory.title')} 
-          value={stats.totalAssets} 
-          icon="📦"
-          color="green"
-        />
-        <StatCard 
-          label={t('warehouse.title')} 
-          value={stats.warehouseAssets} 
-          icon="🏢"
-          color="indigo"
-        />
-        <StatCard 
-          label={t('messages.lowStock', 'Düşük Stok Uyarısı')} 
-          value={stats.lowStock} 
-          icon="⚠️"
-          color="red"
-          warning 
-        />
-        <StatCard
-          label={t('messages.totalValue', 'Toplam Envanter Değeri')}
-          value={`${(stats.totalValue).toLocaleString('tr-TR')} ₺`}
-          icon="💰"
-          color="yellow"
-          className="sm:col-span-2 lg:col-span-1"
-        />
-      </div>
-      
-      {/* Hızlı erişim kartları */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-gray-900">{t('dashboard.quickAccess')}</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <QuickActionCard
-            href="/warehouse"
-            title={t('dashboard.addAsset')}
-            description={t('warehouse.addAsset')}
-            icon="➕"
-            color="blue"
-          />
-          <QuickActionCard
-            href="/inventory"
-            title="Envanter Yönetimi"
-            description="Tüm varlıkları görüntüleyin ve yönetin"
-            icon="�"
-            color="green"
-          />
-          <QuickActionCard
-            href="/decommissioned"
-            title={t('messages.archive', 'Arşiv')}
-            description={t('messages.decomAssets', 'Kullanım dışı varlıklar')}
-            icon="📥"
-            color="gray"
-          />
-          <QuickActionCard
-            href="/management"
-            title={t('management.title')}
-            description={t('dashboard.manageUsers')}
-            icon="⚙️"
-            color="purple"
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-function StatCard({
-  label,
-  value,
-  warning,
-  icon,
-  color = "blue",
-  className = "",
-}: {
-  label: string;
-  value: string | number;
-  warning?: boolean;
-  icon?: string;
-  color?: string;
-  className?: string;
-}) {
-  const colorClasses = {
-    blue: "bg-blue-50 border-blue-200 text-blue-700",
-    green: "bg-green-50 border-green-200 text-green-700",
-    indigo: "bg-indigo-50 border-indigo-200 text-indigo-700",
-    red: "bg-red-50 border-red-200 text-red-700",
-    yellow: "bg-yellow-50 border-yellow-200 text-yellow-700",
-  };
-
-  return (
-    <div
-      className={`card-mobile ${warning ? "border-red-300 bg-red-50" : ""} ${className}`}
-    >
-      <div className="flex items-center justify-between mb-2">
-        <div className="text-sm font-medium text-gray-600">{label}</div>
-        {icon && <span className="text-xl">{icon}</span>}
-      </div>
-      <div
-        className={`text-2xl md:text-3xl font-bold ${
-          warning ? "text-red-600" : `text-${color}-600`
-        }`}
-      >
-        {value}
-      </div>
-    </div>
-  );
+interface QuickActionCardProps {
+  href: string;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
 }
 
-function QuickActionCard({
+const QuickActionCard: React.FC<QuickActionCardProps> = ({
   href,
   title,
   description,
   icon,
-  color = "blue",
-}: {
-  href: string;
+  color,
+}) => (
+  <Link
+    href={href}
+    className={`block p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ${color}`}
+  >
+    <div className="flex items-center mb-4">
+      <div className="text-3xl mr-4">{icon}</div>
+      <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
+        {title}
+      </h3>
+    </div>
+    <p className="text-gray-600 dark:text-gray-300">{description}</p>
+  </Link>
+);
+
+interface StatsCardProps {
   title: string;
-  description: string;
-  icon: string;
-  color?: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className="card-mobile hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group block"
-    >
-      <div className="flex items-start gap-3">
-        <div className={`p-2 rounded-lg bg-${color}-100 text-${color}-600 text-xl group-hover:scale-110 transition-transform`}>
-          {icon}
-        </div>
-        <div className="flex-1">
-          <h3 className="font-semibold text-gray-900 mb-1">{title}</h3>
-          <p className="text-sm text-gray-600">{description}</p>
-        </div>
-        <div className="text-gray-400 group-hover:text-gray-600 transition-colors">
-          <span className="text-lg">→</span>
-        </div>
-      </div>
-    </Link>
-  );
+  value: number;
+  icon: React.ReactNode;
+  color: string;
 }
 
-export default DashboardPage;
+const StatsCard: React.FC<StatsCardProps> = ({ title, value, icon, color }) => (
+  <div className={`p-6 rounded-lg shadow-md ${color}`}>
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-gray-600 dark:text-gray-300 text-sm">{title}</p>
+        <p className="text-3xl font-bold text-gray-800 dark:text-white">
+          {value}
+        </p>
+      </div>
+      <div className="text-4xl opacity-80">{icon}</div>
+    </div>
+  </div>
+);
+
+export default function Dashboard() {
+  const { t, locale } = useTranslation();
+  const { data: session } = useSession();
+
+  const { data: inventoryData } = useQuery({
+    queryKey: ["inventory"],
+    queryFn: async () => {
+      const response = await fetch("/api/inventory");
+      if (!response.ok) throw new Error("Failed to fetch inventory");
+      return response.json();
+    },
+  });
+
+  const { data: userData } = useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const response = await fetch("/api/user");
+      if (!response.ok) throw new Error("Failed to fetch users");
+      return response.json();
+    },
+  });
+
+  const stats = {
+    totalAssets: inventoryData?.length || 0,
+    availableAssets:
+      inventoryData?.filter((item: any) => item.status === "AVAILABLE")
+        ?.length || 0,
+    assignedAssets:
+      inventoryData?.filter((item: any) => item.status === "ASSIGNED")?.length ||
+      0,
+    totalUsers: userData?.length || 0,
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
+            {t("dashboard.title")}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            {t("dashboard.welcome")}, {session?.user?.name}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <StatsCard
+            title={t("dashboard.totalAssets")}
+            value={stats.totalAssets}
+            icon="📦"
+            color="bg-blue-100 dark:bg-blue-900"
+          />
+          <StatsCard
+            title={t("dashboard.availableAssets")}
+            value={stats.availableAssets}
+            icon="✅"
+            color="bg-green-100 dark:bg-green-900"
+          />
+          <StatsCard
+            title={t("dashboard.assignedAssets")}
+            value={stats.assignedAssets}
+            icon="👤"
+            color="bg-yellow-100 dark:bg-yellow-900"
+          />
+          <StatsCard
+            title={t("dashboard.totalUsers")}
+            value={stats.totalUsers}
+            icon="👥"
+            color="bg-purple-100 dark:bg-purple-900"
+          />
+        </div>
+
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
+            {t("dashboard.quickActions")}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <QuickActionCard
+              href={`/${locale}/warehouse`}
+              title={t("dashboard.addAsset")}
+              description={t("warehouse.addAsset")}
+              icon="➕"
+              color="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+            />
+            <QuickActionCard
+              href={`/${locale}/inventory`}
+              title={t("dashboard.viewInventory")}
+              description={t("inventory.viewAll")}
+              icon="📋"
+              color="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+            />
+            <QuickActionCard
+              href={`/${locale}/units`}
+              title={t("dashboard.manageUnits")}
+              description={t("units.manage")}
+              icon="🏢"
+              color="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+            />
+            <QuickActionCard
+              href={`/${locale}/management`}
+              title={t("dashboard.userManagement")}
+              description={t("management.users")}
+              icon="👤"
+              color="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+            />
+            <QuickActionCard
+              href={`/${locale}/decommissioned`}
+              title={t("dashboard.decommissioned")}
+              description={t("decommissioned.view")}
+              icon="🗑️"
+              color="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+            />
+            <QuickActionCard
+              href={`/${locale}/profile`}
+              title={t("dashboard.profile")}
+              description={t("profile.manage")}
+              icon="⚙️"
+              color="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+            />
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
+            {t("dashboard.recentActivity")}
+          </h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <p className="text-gray-600 dark:text-gray-300">
+              {t("dashboard.noRecentActivity")}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

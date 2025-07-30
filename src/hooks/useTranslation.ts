@@ -12,8 +12,10 @@ export function useTranslation() {
   const params = useParams();
   const router = useRouter();
   
-  // URL params'dan locale'i al
-  const currentLocale = (params?.locale as string) || 'tr';
+  // URL params'dan locale'i al - geçerli locale'leri kontrol et
+  const validLocales = ['tr', 'en', 'sq'];
+  const paramLocale = params?.locale as string;
+  const currentLocale = validLocales.includes(paramLocale) ? paramLocale : 'tr';
 
   useEffect(() => {
     loadTranslations(currentLocale);

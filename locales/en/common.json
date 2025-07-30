@@ -1,4 +1,19 @@
 {
+  "home": {
+    "description": "Modern, secure and comprehensive inventory management system for IT departments.",
+    "loginButton": "Login"
+  },
+  "login": {
+    "welcome": "Welcome",
+    "subtitle": "Login to Inventory Management System",
+    "email": "Email",
+    "emailPlaceholder": "example@email.com",
+    "password": "Password",
+    "loginButton": "Login",
+    "loggingIn": "Logging in...",
+    "invalidCredentials": "Invalid email or password",
+    "genericError": "An error occurred"
+  },
   "nav": {
     "home": "Home",
     "warehouse": "Warehouse",
@@ -75,12 +90,5 @@
     "error": "An error occurred",
     "deleteConfirm": "Are you sure you want to delete this item?",
     "noData": "No data found"
-  },
-  "login": {
-    "title": "Sign In",
-    "email": "Email",
-    "password": "Password",
-    "signIn": "Sign In",
-    "signingIn": "Signing in..."
   }
 }

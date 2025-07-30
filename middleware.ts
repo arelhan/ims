@@ -25,8 +25,9 @@ function getLocale(request: NextRequest) {
     return defaultLocale
   }
 
-  // Path'deki locale'i al
-  return pathname.split('/')[1]
+  // Path'deki locale'i al ve geçerli olup olmadığını kontrol et
+  const pathLocale = pathname.split('/')[1]
+  return locales.includes(pathLocale) ? pathLocale : defaultLocale
 }
 
 export function middleware(request: NextRequest) {
@@ -58,7 +59,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Skip all internal paths (_next)
-    '/((?!_next|api|locales|favicon.ico|.*\\.).*)',
+    // Skip all internal paths (_next, api, locales, static files)
+    '/((?!_next|api|locales|favicon.ico|.*\\.|sitemap.xml|robots.txt).*)',
   ],
 }
