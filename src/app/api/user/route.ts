@@ -16,7 +16,7 @@ const createUserSchema = z.object({
   password: z.string().min(6),
   name: z.string().min(1),
   role: z.nativeEnum(UserRole).optional(),
-  unitId: z.string().optional().nullable(),
+  unitId: z.string().optional().nullable().transform(val => val === "" ? null : val),
 }).refine((data) => {
   // Admin değilse unitId zorunlu
   if (data.role !== UserRole.ADMIN && !data.unitId) {
@@ -33,7 +33,7 @@ const updateUserSchema = z.object({
   password: z.string().min(6).optional(),
   name: z.string().min(1).optional(),
   role: z.nativeEnum(UserRole).optional(),
-  unitId: z.string().optional().nullable(),
+  unitId: z.string().optional().nullable().transform(val => val === "" ? null : val),
 }).refine((data) => {
   // Eğer role güncelleniyor ve ADMIN değilse, unitId olmalı
   if (data.role && data.role !== UserRole.ADMIN && !data.unitId) {

@@ -124,7 +124,9 @@
     "success": "Operacioni u krye me sukses",
     "error": "Ndodhi një gabim",
     "deleteConfirm": "Jeni i sigurt që doni të fshini këtë element?",
-    "noData": "Nuk u gjetën të dhëna"
+    "noData": "Nuk u gjetën të dhëna",
+    "archive": "Mbeturinat",
+    "decomAssets": "Asetet jashtë Përdorimi"
   },
   "details": {
     "title": "Detajet e Asetit",

@@ -79,7 +79,9 @@ export default function Dashboard() {
   });
 
   const stats = {
-    totalAssets: inventoryData?.length || 0,
+    totalAssets: inventoryData?.filter((item: any) => 
+      item.status !== "DECOMMISSIONED" && item.status !== "ARCHIVED"
+    )?.length || 0,
     availableAssets:
       inventoryData?.filter((item: any) => item.status === "AVAILABLE")
         ?.length || 0,

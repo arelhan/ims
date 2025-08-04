@@ -119,7 +119,7 @@ const ProfilePage = () => {
             <div className="border border-red-200 p-4 rounded bg-red-50">
               <h3 className="font-semibold text-red-800 mb-2">Veritabanı Temizleme</h3>
               <p className="text-sm text-red-600 mb-3">
-                Bu işlem tüm ürünleri, birimleri, kullanıcıları (admin hariç) ve çöp kutusunu kalıcı olarak siler.
+                Bu işlem tüm ürünleri kalıcı olarak siler. Kategoriler ve markalar korunur.
               </p>
               <button
                 onClick={() => setShowDeleteDialog(true)}

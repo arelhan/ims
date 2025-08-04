@@ -13,15 +13,7 @@ function getLocale(request: NextRequest) {
 
   // Eğer path'de locale yoksa
   if (pathnameIsMissingLocale) {
-    // Accept-Language header'ından locale'i al
-    const acceptLanguage = request.headers.get('accept-language')
-    if (acceptLanguage) {
-      for (const locale of locales) {
-        if (acceptLanguage.includes(locale)) {
-          return locale
-        }
-      }
-    }
+    // Her zaman default locale'i döndür (Accept-Language header'ını görmezden gel)
     return defaultLocale
   }
 

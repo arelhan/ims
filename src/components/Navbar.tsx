@@ -33,12 +33,6 @@ const getNavItems = (locale: string, t: (key: string) => string) => [
     description: t('messages.decomAssets')
   },
   { 
-    href: `/${locale}/units`, 
-    label: t('management.units'), 
-    icon: "🏛️",
-    description: t('management.units')
-  },
-  { 
     href: `/${locale}/management`, 
     label: t('nav.management'), 
     icon: "⚙️",

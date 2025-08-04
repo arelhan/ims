@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSession } from "next-auth/react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 type DecommissionedItem = {
   id: string;
@@ -17,19 +18,12 @@ type DecommissionedItem = {
 
 export default function DecommissionedPage() {
   const { data: session } = useSession();
-  const [items, setItems] = useState<DecommissionedItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   const [archiveLoading, setArchiveLoading] = useState(false);
 
-  useEffect(() => {
-    fetchDecommissionedItems();
-  }, []);
-
-  async function fetchDecommissionedItems() {
-    setLoading(true);
-    setError(null);
-    try {
+  const { data: items = [], isLoading: loading, error, refetch } = useQuery({
+    queryKey: ['decommissioned-items'],
+    queryFn: async () => {
       const res = await fetch("/api/inventory");
       if (!res.ok) throw new Error("Veriler alınamadı");
       const allItems = await res.json();
@@ -38,12 +32,9 @@ export default function DecommissionedPage() {
       const decommissionedItems = allItems.filter(
         (item: any) => item.status === "DECOMMISSIONED"
       );
-      setItems(decommissionedItems);
-    } catch (err: any) {
-      setError(err.message || "Bir hata oluştu");
-    }
-    setLoading(false);
-  }
+      return decommissionedItems;
+    },
+  });
 
   const handleArchiveAll = async () => {
     if (items.length === 0) {
@@ -67,8 +58,9 @@ export default function DecommissionedPage() {
       if (response.ok) {
         const result = await response.json();
         alert(`${result.archivedCount} ürün başarıyla arşivlendi!`);
-        // Sayfayı yenile
-        fetchDecommissionedItems();
+        // React Query cache'lerini invalidate et
+        queryClient.invalidateQueries({ queryKey: ['decommissioned-items'] });
+        queryClient.invalidateQueries({ queryKey: ['inventory'] });
       } else {
         const error = await response.text();
         alert(`Hata: ${error}`);
@@ -133,7 +125,7 @@ export default function DecommissionedPage() {
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-6">
-          Hata: {error}
+          Hata: {error.message}
         </div>
       )}
 

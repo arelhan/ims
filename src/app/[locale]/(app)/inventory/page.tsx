@@ -103,11 +103,13 @@ export default function InventoryPage() {
     },
   });
 
-  // Atanmış items'ları filtrele
+  // Atanmış items'ları filtrele (DECOMMISSIONED ve ARCHIVED olanları hariç tut)
   const items = allItems.filter(
     (item: any) =>
       item.assignedTo &&
-      (item.status === "ASSIGNED" || item.status === "IN_SERVICE"),
+      (item.status === "ASSIGNED" || item.status === "IN_SERVICE") &&
+      item.status !== "DECOMMISSIONED" &&
+      item.status !== "ARCHIVED",
   );
 
   const loading = itemsLoading || categoriesLoading;

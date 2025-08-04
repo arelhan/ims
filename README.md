@@ -6,7 +6,8 @@ Modern, mobil-öncelikli envanter yönetim sistemi. Next.js, Prisma ve PostgreSQ
 
 ### ✅ Tamamlanan Özellikler
 - **Mobil-Öncelikli Tasarım**: Responsive ve touch-friendly arayüz
-- **Mobil Alt Navigasyon**: Anasayfa, Depo, Envanter, Yönetim
+- **Çoklu Dil Desteği**: Türkçe, İngilizce, Arnavutça (i18n)
+- **Mobil Alt Navigasyon**: Dashboard, Depo, Envanter, Arşiv, Yönetim
 - **QR Kod Sistemi**: Ürün bilgileri için QR kod üretimi ve info sayfaları
 - **Info Sayfaları**: Menüsüz, sadece ürün bilgilerini gösteren özel sayfalar
 - **Otomatik Ürün Kodu Sistemi**: Kategori bazlı benzersiz kodlar (örn: DSA-000001)
@@ -16,20 +17,22 @@ Modern, mobil-öncelikli envanter yönetim sistemi. Next.js, Prisma ve PostgreSQ
 - **Kullanıcı Yetkilendirme**: ADMIN/USER rolleri ve unitId filtreleme
 - **Dinamik Form Alanları**: Kategori bazlı özel form alanları
 - **Durum Takibi**: Mevcut, Atanmış, Kullanımda, Hizmet Dışı, Arşivlenmiş
+- **Arşiv Yönetimi**: Devre dışı ürünlerin ayrı sayfada yönetimi
 
 ### 🎯 Ana Sayfalar
 - **Dashboard**: Genel sistem özeti ve hızlı navigasyon
 - **Depo**: Yeni varlık ekleme ve kategori yönetimi
 - **Envanter**: Tüm varlıkların listesi, arama ve filtreleme
-- **Yönetim**: Kullanıcı, birim, kategori ve marka yönetimi
+- **Arşiv**: Devre dışı/arşivlenmiş ürünlerin yönetimi
+- **Yönetim**: Kullanıcı, kategori ve marka yönetimi
 - **Info Sayfaları**: QR kod ile erişilen salt-okunur ürün sayfaları
 
 ### 🔧 Yönetim Özellikleri
 - **Kullanıcı Yönetimi**: Ekleme, silme, rol atama
-- **Birim Yönetimi**: Organizasyonel birimlerin yönetimi
 - **Kategori Yönetimi**: 3 harfli kodlarla kategori tanımlama
 - **Marka Yönetimi**: Marka ekleme ve silme
 - **Modal Navigasyon**: Tüm modallar geri buton desteği
+- **Database Yönetimi**: Seçici temizleme ve arşivleme
 
 ## 🛠️ Teknoloji Stack
 
@@ -39,13 +42,18 @@ Modern, mobil-öncelikli envanter yönetim sistemi. Next.js, Prisma ve PostgreSQ
 - **Styling**: Tailwind CSS
 - **State Management**: React Query (TanStack Query)
 - **Authentication**: NextAuth.js
+- **Internationalization**: next-i18next benzeri custom hook
 - **QR Kod**: Canvas-based QR code generation
 - **Form Validation**: Zod
 - **Deployment**: Vercel Ready
 
 ## 📋 Kurulum
 
-Detaylı kurulum talimatları için [`KURULUM_REHBERI.md`](./KURULUM_REHBERI.md) dosyasına bakın.
+### Windows Kurulumu
+Windows için detaylı kurulum talimatları: [`WINDOWS_KURULUM_REHBERI.md`](./WINDOWS_KURULUM_REHBERI.md)
+
+### Linux/Mac Kurulumu  
+Detaylı kurulum talimatları: [`KURULUM_REHBERI.md`](./KURULUM_REHBERI.md)
 
 ### Hızlı Başlangıç
 

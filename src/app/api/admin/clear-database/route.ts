@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Transaction kullanarak tüm verileri sil
+    // Transaction kullanarak sadece inventory verilerini sil
     await prisma.$transaction(async (tx) => {
       // 1. Önce foreign key constraints'e dikkat ederek sırayla sil
       
@@ -25,56 +25,21 @@ export async function POST(request: NextRequest) {
       // Decommissioned kayıtları
       await tx.decommissioned.deleteMany({});
       
-      // Inventory kayıtları
+      // Inventory kayıtları (sadece ürünleri sil, kategoriler ve markalar kalsın)
       await tx.inventory.deleteMany({});
-      
-      // Category kayıtları
-      await tx.category.deleteMany({});
-      
-      // Brand kayıtları
-      await tx.brand.deleteMany({});
-      
-      // Admin olmayan kullanıcıları sil
-      await tx.user.deleteMany({
-        where: {
-          role: {
-            not: "ADMIN"
-          }
-        }
-      });
-      
-      // Unit kayıtları (sadece kullanıcısı olmayanları)
-      const unitsWithUsers = await tx.unit.findMany({
-        where: {
-          users: {
-            some: {}
-          }
-        },
-        select: { id: true }
-      });
-      
-      const unitIdsWithUsers = unitsWithUsers.map(unit => unit.id);
-      
-      await tx.unit.deleteMany({
-        where: {
-          id: {
-            notIn: unitIdsWithUsers
-          }
-        }
-      });
     });
 
-    console.log("Database cleared successfully by admin:", session.user.email);
+    console.log("Inventory data cleared successfully by admin:", session.user.email);
     
     return NextResponse.json({ 
       success: true, 
-      message: "Veritabanı başarıyla temizlendi" 
+      message: "Tüm ürünler başarıyla silindi (kategoriler ve markalar korundu)" 
     });
 
   } catch (error) {
-    console.error("Database clear error:", error);
+    console.error("Inventory clear error:", error);
     return NextResponse.json(
-      { error: "Veritabanı temizleme sırasında hata oluştu" },
+      { error: "Ürün verilerini temizleme sırasında hata oluştu" },
       { status: 500 }
     );
   }

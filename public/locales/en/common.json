@@ -1,7 +1,14 @@
 {
   "home": {
     "description": "Modern, secure and comprehensive inventory management system for IT departments.",
-    "loginButton": "Login"
+    "  "messages": {
+    "success": "Operation completed successfully",
+    "error": "An error occurred",
+    "deleteConfirm": "Are you sure you want to delete this item?",
+    "noData": "No data found",
+    "archive": "Trash",
+    "decomAssets": "Decommissioned Assets"
+  },utton": "Login"
   },
   "login": {
     "welcome": "Welcome",
@@ -124,7 +131,9 @@
     "success": "Operation successful",
     "error": "An error occurred",
     "deleteConfirm": "Are you sure you want to delete this item?",
-    "noData": "No data found"
+    "noData": "No data found",
+    "archive": "Trash",
+    "decomAssets": "Decommissioned Assets"
   },
   "details": {
     "title": "Asset Details",

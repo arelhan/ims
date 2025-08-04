@@ -42,6 +42,7 @@ const ManagementPage = () => {
 
 function UsersTab() {
   const [users, setUsers] = useState<any[]>([]);
+  const [units, setUnits] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
@@ -50,6 +51,7 @@ function UsersTab() {
     email: "",
     password: "",
     role: "USER",
+    unitId: "",
   });
   const [addLoading, setAddLoading] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
@@ -57,6 +59,7 @@ function UsersTab() {
 
   useEffect(() => {
     fetchUsers();
+    fetchUnits();
   }, []);
 
   async function fetchUsers() {
@@ -70,6 +73,16 @@ function UsersTab() {
       setError(err.message || "Bir hata oluştu");
     }
     setLoading(false);
+  }
+
+  async function fetchUnits() {
+    try {
+      const res = await fetch("/api/unit");
+      if (!res.ok) throw new Error("Birimler alınamadı");
+      setUnits(await res.json());
+    } catch (err: any) {
+      console.error("Birimler yüklenemedi:", err);
+    }
   }
 
   async function handleAddUser(e: React.FormEvent) {
@@ -87,7 +100,7 @@ function UsersTab() {
         throw new Error(data.error || "Kayıt başarısız");
       }
       setShowAdd(false);
-      setAddForm({ name: "", email: "", password: "", role: "USER" });
+      setAddForm({ name: "", email: "", password: "", role: "USER", unitId: "" });
       fetchUsers();
     } catch (err: any) {
       setAddError(err.message || "Bir hata oluştu");
@@ -127,6 +140,7 @@ function UsersTab() {
               <th className="py-2 px-4 border-b">Ad Soyad</th>
               <th className="py-2 px-4 border-b">E-posta</th>
               <th className="py-2 px-4 border-b">Rol</th>
+              <th className="py-2 px-4 border-b">Birim</th>
               <th className="py-2 px-4 border-b">İşlem</th>
             </tr>
           </thead>
@@ -136,6 +150,9 @@ function UsersTab() {
                 <td className="py-2 px-4 border-b">{user.name}</td>
                 <td className="py-2 px-4 border-b">{user.email}</td>
                 <td className="py-2 px-4 border-b">{user.role}</td>
+                <td className="py-2 px-4 border-b">
+                  {user.unit ? user.unit.name : (user.role === "ADMIN" ? "Admin" : "Birim Atanmamış")}
+                </td>
                 <td className="py-2 px-4 border-b">
                   <button
                     className="text-red-600 hover:underline"
@@ -225,6 +242,26 @@ function UsersTab() {
                   <option value="ADMIN">ADMIN</option>
                 </select>
               </div>
+              {addForm.role !== "ADMIN" && (
+                <div>
+                  <label className="block mb-1 font-medium">Birim <span className="text-red-500">*</span></label>
+                  <select
+                    className="w-full border px-3 py-2 rounded"
+                    value={addForm.unitId}
+                    onChange={(e) =>
+                      setAddForm((f) => ({ ...f, unitId: e.target.value }))
+                    }
+                    required={addForm.role !== "ADMIN"}
+                  >
+                    <option value="">Birim Seçin</option>
+                    {units.map((unit) => (
+                      <option key={unit.id} value={unit.id}>
+                        {unit.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
               {addError && (
                 <div className="text-red-600 text-sm">{addError}</div>
               )}

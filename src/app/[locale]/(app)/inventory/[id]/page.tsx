@@ -40,6 +40,7 @@ export default function InventoryDetailPage() {
       : Array.isArray(params.id)
         ? params.id[0]
         : "";
+  const locale = params.locale as string;
 
   // React Query ile data fetch
   const { data: item, isLoading, error } = useQuery({
@@ -149,6 +150,8 @@ export default function InventoryDetailPage() {
       const updatedItem = await res.json();
       // React Query cache'ini güncelle
       queryClient.setQueryData(['inventory', id], updatedItem);
+      queryClient.invalidateQueries({ queryKey: ['inventory'] });
+      queryClient.invalidateQueries({ queryKey: ['decommissioned-items'] });
       setEditModal(false);
     } catch (err: any) {
       setEditError(err.message || "Bir hata oluştu");
@@ -167,7 +170,12 @@ export default function InventoryDetailPage() {
       
       if (!res.ok) throw new Error(t('messages.error'));
       
-      router.push("/inventory");
+      // React Query cache'lerini invalidate et
+      queryClient.invalidateQueries({ queryKey: ['inventory'] });
+      queryClient.invalidateQueries({ queryKey: ['inventory', id] });
+      queryClient.invalidateQueries({ queryKey: ['decommissioned-items'] });
+      
+      router.push(`/${locale}/inventory`);
     } catch {
       alert(t('messages.error'));
     }
@@ -192,7 +200,7 @@ export default function InventoryDetailPage() {
           {error?.message || t('details.productNotFound')}
         </div>
         <button
-          onClick={() => router.push('/inventory')}
+          onClick={() => router.push(`/${locale}/inventory`)}
           className="mt-4 text-blue-600 hover:text-blue-800 transition-colors"
         >
           ← {t('forms.back')}
@@ -260,7 +268,7 @@ export default function InventoryDetailPage() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => router.push('/inventory')}
+            onClick={() => router.push(`/${locale}/inventory`)}
             className="text-gray-500 hover:text-gray-700 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
