@@ -25,11 +25,23 @@
   "dashboard": {
     "title": "Inventory Management System",
     "subtitle": "Welcome",
+    "welcome": "Welcome",
     "quickAccess": "Quick Access",
+    "quickActions": "Quick Actions",
     "addAsset": "Add Asset",
     "viewInventory": "View Inventory",
     "manageUsers": "Manage Users",
-    "viewReports": "View Reports"
+    "userManagement": "User Management",
+    "manageUnits": "Manage Units",
+    "viewReports": "View Reports",
+    "totalAssets": "Total Assets",
+    "availableAssets": "Available Assets",
+    "assignedAssets": "Assigned Assets",
+    "totalUsers": "Total Users",
+    "decommissioned": "Decommissioned",
+    "profile": "Profile",
+    "recentActivity": "Recent Activity",
+    "noRecentActivity": "No recent activity"
   },
   "warehouse": {
     "title": "Warehouse Management",
@@ -40,6 +52,7 @@
   },
   "inventory": {
     "title": "Inventory",
+    "viewAll": "View All",
     "search": "Search...",
     "filter": "Filter",
     "status": "Status",
@@ -84,6 +97,18 @@
     "required": "This field is required",
     "categoryCode": "3-Letter Code",
     "categoryCodePlaceholder": "LPT, PRT, etc."
+  },
+  "units": {
+    "title": "Units",
+    "manage": "Manage Units"
+  },
+  "decommissioned": {
+    "title": "Decommissioned Assets",
+    "view": "View Decommissioned"
+  },
+  "profile": {
+    "title": "Profile",
+    "manage": "Manage Profile"
   },
   "messages": {
     "success": "Operation successful",

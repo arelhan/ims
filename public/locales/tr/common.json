@@ -25,11 +25,23 @@
   "dashboard": {
     "title": "Envanter Yönetim Sistemi",
     "subtitle": "Hoşgeldiniz",
+    "welcome": "Hoşgeldiniz",
     "quickAccess": "Hızlı Erişim",
+    "quickActions": "Hızlı İşlemler",
     "addAsset": "Varlık Ekle",
     "viewInventory": "Envanter Görüntüle",
     "manageUsers": "Kullanıcı Yönetimi",
-    "viewReports": "Raporlar"
+    "userManagement": "Kullanıcı Yönetimi",
+    "manageUnits": "Birim Yönetimi",
+    "viewReports": "Raporlar",
+    "totalAssets": "Toplam Varlık",
+    "availableAssets": "Mevcut Varlıklar",
+    "assignedAssets": "Atanmış Varlıklar",
+    "totalUsers": "Toplam Kullanıcı",
+    "decommissioned": "Kullanım Dışı",
+    "profile": "Profil",
+    "recentActivity": "Son Aktiviteler",
+    "noRecentActivity": "Henüz aktivite yok"
   },
   "warehouse": {
     "title": "Depo Yönetimi",
@@ -40,6 +52,7 @@
   },
   "inventory": {
     "title": "Envanter",
+    "viewAll": "Tümünü Görüntüle",
     "search": "Ara...",
     "filter": "Filtrele",
     "status": "Durum",
@@ -84,6 +97,18 @@
     "required": "Bu alan zorunludur",
     "categoryCode": "3 Harfli Kod",
     "categoryCodePlaceholder": "LPT, PRT, vb."
+  },
+  "units": {
+    "title": "Birimler",
+    "manage": "Birim Yönetimi"
+  },
+  "decommissioned": {
+    "title": "Kullanım Dışı Varlıklar",
+    "view": "Kullanım Dışı Görüntüle"
+  },
+  "profile": {
+    "title": "Profil",
+    "manage": "Profil Yönetimi"
   },
   "messages": {
     "success": "İşlem başarılı",

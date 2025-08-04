@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import useTranslation from '@/hooks/useTranslation';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const languages = [
   { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },

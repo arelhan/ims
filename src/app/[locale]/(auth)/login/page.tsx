@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import useTranslation from '@/hooks/useTranslation';
+import { useTranslation } from '@/hooks/useTranslation';
 import LanguageSelector from '@/components/LanguageSelector';
 
 export default function LoginPage() {

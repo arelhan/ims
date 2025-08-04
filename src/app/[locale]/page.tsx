@@ -1,6 +1,6 @@
 'use client';
 
-import useTranslation from '@/hooks/useTranslation';
+import { useTranslation } from '@/hooks/useTranslation';
 import LanguageSelector from '@/components/LanguageSelector';
 import Link from 'next/link';
 

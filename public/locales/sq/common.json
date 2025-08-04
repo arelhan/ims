@@ -25,11 +25,23 @@
   "dashboard": {
     "title": "Sistemi i Menaxhimit të Inventarit",
     "subtitle": "Mirësevini",
+    "welcome": "Mirësevini",
     "quickAccess": "Qasje e Shpejtë",
+    "quickActions": "Veprime të Shpejta",
     "addAsset": "Shto Aset",
     "viewInventory": "Shiko Inventarin",
     "manageUsers": "Menaxho Përdoruesit",
-    "viewReports": "Shiko Raportet"
+    "userManagement": "Menaxhimi i Përdoruesve",
+    "manageUnits": "Menaxho Njësitë",
+    "viewReports": "Shiko Raportet",
+    "totalAssets": "Asetet Totale",
+    "availableAssets": "Asetet e Disponueshme",
+    "assignedAssets": "Asetet e Caktuara",
+    "totalUsers": "Përdoruesit Total",
+    "decommissioned": "Jashtë Përdorimi",
+    "profile": "Profili",
+    "recentActivity": "Aktivitetet e Fundit",
+    "noRecentActivity": "Nuk ka aktivitet të fundit"
   },
   "warehouse": {
     "title": "Menaxhimi i Depos",
@@ -40,6 +52,7 @@
   },
   "inventory": {
     "title": "Inventari",
+    "viewAll": "Shiko të Gjitha",
     "search": "Kërko...",
     "filter": "Filtro",
     "status": "Statusi",
@@ -84,6 +97,18 @@
     "required": "Kjo fushë është e detyrueshme",
     "categoryCode": "Kodi me 3 Shkronja",
     "categoryCodePlaceholder": "LPT, PRT, etj."
+  },
+  "units": {
+    "title": "Njësitë",
+    "manage": "Menaxho Njësitë"
+  },
+  "decommissioned": {
+    "title": "Asetet jashtë Përdorimi",
+    "view": "Shiko jashtë Përdorimi"
+  },
+  "profile": {
+    "title": "Profili",
+    "manage": "Menaxho Profilin"
   },
   "messages": {
     "success": "Operacioni u krye me sukses",
