@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 const locales = ['tr', 'en', 'sq']
-const defaultLocale = 'tr'
+const defaultLocale = 'en'
 
 function getLocale(request: NextRequest) {
   // URL'den locale'i kontrol et

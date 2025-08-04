@@ -553,13 +553,13 @@ export default function InventoryDetailPage() {
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       value={editForm.location}
                       onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
-                      placeholder="Raf/Bölüm"
+                      placeholder={t('forms.location')}
                     />
                   </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Satın Alma Fiyatı
+                      {t('details.purchasePrice')}
                     </label>
                     <input
                       type="number"
@@ -575,48 +575,48 @@ export default function InventoryDetailPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Durum
+                      {t('details.condition')}
                     </label>
                     <select
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       value={editForm.condition}
                       onChange={(e) => setEditForm({ ...editForm, condition: e.target.value })}
                     >
-                      <option value="">Durum seçin</option>
-                      <option value="new">Yeni</option>
-                      <option value="used">Kullanılmış</option>
-                      <option value="refurbished">Yenilenmiş</option>
-                      <option value="damaged">Hasarlı</option>
+                      <option value="">{t('forms.selectCondition')}</option>
+                      <option value="new">{t('forms.new')}</option>
+                      <option value="used">{t('forms.used')}</option>
+                      <option value="refurbished">{t('forms.refurbished')}</option>
+                      <option value="damaged">{t('forms.damaged')}</option>
                     </select>
                   </div>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Varlık Durumu
+                    {t('inventory.status')}
                   </label>
                   <select
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     value={editForm.status}
                     onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
                   >
-                    <option value="AVAILABLE">Mevcut</option>
-                    <option value="ASSIGNED">Atanmış</option>
-                    <option value="IN_SERVICE">Kullanımda</option>
-                    <option value="DECOMMISSIONED">Hizmet Dışı</option>
+                    <option value="AVAILABLE">{t('inventory.available')}</option>
+                    <option value="ASSIGNED">{t('inventory.assigned')}</option>
+                    <option value="IN_SERVICE">{t('inventory.inUse')}</option>
+                    <option value="DECOMMISSIONED">{t('inventory.outOfService')}</option>
                   </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Atanacak Kullanıcı
+                    {t('forms.assignUser')}
                   </label>
                   <select
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     value={editForm.assignedToId}
                     onChange={(e) => setEditForm({ ...editForm, assignedToId: e.target.value })}
                   >
-                    <option value="">Depoda (Kimseye atanmamış)</option>
+                    <option value="">{t('forms.notAssigned')}</option>
                     {users.map((user) => (
                       <option key={user.id} value={user.id}>
                         {user.name} ({user.email})
@@ -627,14 +627,14 @@ export default function InventoryDetailPage() {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Notlar
+                    {t('details.notes')}
                   </label>
                   <textarea
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     rows={2}
                     value={editForm.notes}
                     onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
-                    placeholder="Ek notlar..."
+                    placeholder={t('forms.notesPlaceholder')}
                   />
                 </div>
                 
@@ -642,7 +642,7 @@ export default function InventoryDetailPage() {
                 {item?.category?.fieldTemplate && (
                   <div>
                     <h3 className="text-lg font-semibold mb-3 text-gray-800">
-                      {item.category.name} Özel Alanları
+                      {item.category.name} {t('details.specialFields')}
                     </h3>
                     <DynamicFields
                       template={item?.category?.fieldTemplate}
@@ -662,14 +662,14 @@ export default function InventoryDetailPage() {
                     setEditError(null);
                   }}
                 >
-                  İptal
+                  {t('forms.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50"
                   disabled={editLoading}
                 >
-                  {editLoading ? "Güncelleniyor..." : "Güncelle"}
+                  {editLoading ? t('forms.saving') : t('forms.save')}
                 </button>
               </div>
             </form>
@@ -682,7 +682,7 @@ export default function InventoryDetailPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full mx-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-800">QR Kod</h2>
+              <h2 className="text-xl font-bold text-gray-800">{t('details.qrCode')}</h2>
               <button
                 onClick={() => setQrModal(false)}
                 className="text-gray-500 hover:text-gray-700"
@@ -704,13 +704,13 @@ export default function InventoryDetailPage() {
               
               <div className="space-y-2 text-sm text-gray-600">
                 <p>
-                  <span className="font-medium">Ürün Kodu:</span><br />
+                  <span className="font-medium">{t('details.productCode')}:</span><br />
                   <span className="font-mono bg-gray-100 px-2 py-1 rounded">
                     {item?.productCode}
                   </span>
                 </p>
                 <p>
-                  <span className="font-medium">Bilgi Sayfası:</span><br />
+                  <span className="font-medium">{t('forms.infoPage')}:</span><br />
                   <a 
                     href={`${window.location.origin}/info/${item?.productCode}`}
                     target="_blank"
@@ -727,7 +727,7 @@ export default function InventoryDetailPage() {
                   onClick={() => setQrModal(false)}
                   className="w-full bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
                 >
-                  Kapat
+                  {t('details.close')}
                 </button>
               </div>
             </div>
