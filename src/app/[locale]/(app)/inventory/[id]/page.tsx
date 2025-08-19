@@ -21,9 +21,12 @@ type InventoryItem = {
   // Yeni alanlar
   location?: string;
   purchasePrice?: number;
+  purchaseDate?: string;
+  warrantyDate?: string;
   supplier?: string;
   model?: string;
   condition?: string;
+  barcode?: string;
   notes?: string;
   createdAt: string;
   updatedAt: string;
@@ -72,8 +75,12 @@ export default function InventoryDetailPage() {
     assignedToId: "",
     location: "",
     purchasePrice: "",
+    purchaseDate: "",
+    warrantyDate: "",
+    supplier: "",
     model: "",
     condition: "",
+    barcode: "",
     notes: "",
     specifications: {},
   });
@@ -93,8 +100,12 @@ export default function InventoryDetailPage() {
         assignedToId: item.assignedTo?.id || "",
         location: item.location || "",
         purchasePrice: item.purchasePrice?.toString() || "",
+        purchaseDate: item.purchaseDate?.split('T')[0] || "",
+        warrantyDate: item.warrantyDate?.split('T')[0] || "",
+        supplier: item.supplier || "",
         model: item.model || "",
         condition: item.condition || "",
+        barcode: item.barcode || "",
         notes: item.notes || "",
         specifications: item.specifications || {},
       });
@@ -130,8 +141,12 @@ export default function InventoryDetailPage() {
         assignedToId: finalAssignedToId,
         location: editForm.location,
         purchasePrice: editForm.purchasePrice ? parseFloat(editForm.purchasePrice) : undefined,
+        purchaseDate: editForm.purchaseDate || undefined,
+        warrantyDate: editForm.warrantyDate || undefined,
+        supplier: editForm.supplier,
         model: editForm.model,
         condition: editForm.condition,
+        barcode: editForm.barcode,
         notes: editForm.notes,
         specifications: editForm.specifications,
       };
@@ -337,6 +352,30 @@ export default function InventoryDetailPage() {
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="text-sm font-medium text-gray-700 mb-1">{t('details.purchasePrice')}</h3>
                   <p className="text-gray-900">{item.purchasePrice.toLocaleString('tr-TR')} ₺</p>
+                </div>
+              )}
+              {item.purchaseDate && (
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-1">Satın Alma Tarihi</h3>
+                  <p className="text-gray-900">{new Date(item.purchaseDate).toLocaleDateString("tr-TR")}</p>
+                </div>
+              )}
+              {item.warrantyDate && (
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-1">Garanti Bitiş Tarihi</h3>
+                  <p className="text-gray-900">{new Date(item.warrantyDate).toLocaleDateString("tr-TR")}</p>
+                </div>
+              )}
+              {item.supplier && (
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-1">Tedarikçi</h3>
+                  <p className="text-gray-900">{item.supplier}</p>
+                </div>
+              )}
+              {item.barcode && (
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-1">Barkod</h3>
+                  <p className="text-gray-900">{item.barcode}</p>
                 </div>
               )}
               {item.condition && (
@@ -576,6 +615,60 @@ export default function InventoryDetailPage() {
                       value={editForm.purchasePrice}
                       onChange={(e) => setEditForm({ ...editForm, purchasePrice: e.target.value })}
                       placeholder="0.00"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Satın Alma Tarihi
+                    </label>
+                    <input
+                      type="date"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      value={editForm.purchaseDate}
+                      onChange={(e) => setEditForm({ ...editForm, purchaseDate: e.target.value })}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Garanti Bitiş Tarihi
+                    </label>
+                    <input
+                      type="date"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      value={editForm.warrantyDate}
+                      onChange={(e) => setEditForm({ ...editForm, warrantyDate: e.target.value })}
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Tedarikçi
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      value={editForm.supplier}
+                      onChange={(e) => setEditForm({ ...editForm, supplier: e.target.value })}
+                      placeholder="Tedarikçi firma adı"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Barkod
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      value={editForm.barcode}
+                      onChange={(e) => setEditForm({ ...editForm, barcode: e.target.value })}
+                      placeholder="Barkod numarası"
                     />
                   </div>
                 </div>

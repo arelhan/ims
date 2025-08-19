@@ -92,6 +92,7 @@ interface CreateInventoryData {
   purchaseDate?: Date;
   purchasePrice?: number;
   warrantyDate?: Date;
+  supplier?: string;
   model?: string;
   specifications?: any;
   notes?: string;

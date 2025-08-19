@@ -87,8 +87,12 @@ export default function WarehousePage() {
     serialNumber: "",
     location: "",
     purchasePrice: "",
+    purchaseDate: "",
+    warrantyDate: "",
+    supplier: "",
     model: "",
     condition: "",
+    barcode: "",
     notes: "",
     specifications: {},
   });
@@ -182,8 +186,12 @@ export default function WarehousePage() {
       serialNumber: "",
       location: "",
       purchasePrice: "",
+      purchaseDate: "",
+      warrantyDate: "",
+      supplier: "",
       model: "",
       condition: "",
+      barcode: "",
       notes: "",
       specifications: {},
     });
@@ -205,8 +213,12 @@ export default function WarehousePage() {
           serialNumber: form.serialNumber,
           location: form.location,
           purchasePrice: form.purchasePrice ? parseFloat(form.purchasePrice) : undefined,
+          purchaseDate: form.purchaseDate || undefined,
+          warrantyDate: form.warrantyDate || undefined,
+          supplier: form.supplier,
           model: form.model,
           condition: form.condition,
+          barcode: form.barcode,
           notes: form.notes,
           specifications: form.specifications,
         }),
@@ -601,6 +613,58 @@ export default function WarehousePage() {
                           setForm((f) => ({ ...f, purchasePrice: e.target.value }))
                         }
                         placeholder="0.00"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block mb-1 font-medium">Satın Alma Tarihi</label>
+                      <input
+                        type="date"
+                        className="w-full border border-gray-300 px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        value={form.purchaseDate}
+                        onChange={(e) =>
+                          setForm((f) => ({ ...f, purchaseDate: e.target.value }))
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="block mb-1 font-medium">Garanti Bitiş Tarihi</label>
+                      <input
+                        type="date"
+                        className="w-full border border-gray-300 px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        value={form.warrantyDate}
+                        onChange={(e) =>
+                          setForm((f) => ({ ...f, warrantyDate: e.target.value }))
+                        }
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block mb-1 font-medium">Tedarikçi</label>
+                      <input
+                        type="text"
+                        className="w-full border border-gray-300 px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        value={form.supplier}
+                        onChange={(e) =>
+                          setForm((f) => ({ ...f, supplier: e.target.value }))
+                        }
+                        placeholder="Tedarikçi firma adı"
+                      />
+                    </div>
+                    <div>
+                      <label className="block mb-1 font-medium">Barkod</label>
+                      <input
+                        type="text"
+                        className="w-full border border-gray-300 px-3 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        value={form.barcode}
+                        onChange={(e) =>
+                          setForm((f) => ({ ...f, barcode: e.target.value }))
+                        }
+                        placeholder="Barkod numarası"
                       />
                     </div>
                   </div>
